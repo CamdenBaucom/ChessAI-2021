@@ -17,6 +17,17 @@ The first problem is creating a chess board that follows the rules of the game. 
 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 ```
+
+
+### Board Evaluation
+The starting board evalutaion will be incredibly simple, just assign values to the pieces and count up the values on both sides. At this point the superiority of a computer becomes apparent when I ask it to go through all possible moves and determine the move which gives the computer the best value regardless of the opponents move. To accomplish I will implement something called Minimax which evaluates the computers best move, max, and the opponents worst move, min. It then moves through a depth first search, which evaluates one line all the way to the given depth before moving to sibling nodes. Once all sibling nodes are investigated it goes back up one level, moves to a sibling and back down to the given depth.
+```
+Depth:1                        (1)
+Depth:2           (2)                       (9) 
+Depth:3     (3)         (6)           (10)       (13)
+Depth:4  (4)   (5)   (7)   (8)     (11)  (12) (14)  (15)
+```
+Essentially, the idea is that the computer chooses random moves for both sides going to the end depth and evalutes the position for both sides assigning a min (for opponent) and max (for computer) value. Additionally, since both values can be negative or positive, to show who is ahead, the overall value is the sum of the min and max. The computer then looks at the sibling nodes and evaluates the min or max value for that position and if that value is greater than the previous value, the min/max is updated, since the computer always assumes that the best move will be played. Once all siblings have been evaluated the computer moves back to a parent's siling and their children, updating min/max only at end nodes. When ever a position updatese the min/max value its path is stored so that if it is the best overall the computer can execute it. An easy improvement to this system is caled Alpha-Beta Pruning, which just allow the compter to stop looking at other siblings once one has been determined to have a worse min/max (or Alpha/Beta). For example, if a computer move has a best response of being up a queen, but a different computer move has one response of being down a queen, there is no need to look at all the other opponent responses since at least one is worse for the computer, thus greatly reducing the number of variants that must be searched and evaluated.
+
 Zorbist Hasing - Transposition
-Minimax basics
-Depth First search
+
