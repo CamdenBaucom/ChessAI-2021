@@ -21,37 +21,24 @@ board64 = [ '0','1','2','3','4','5','6','7',
 '56','57','58','59','60','61','62','63']
 
 board64short = []
-boardstrnew = ""
 boardstr = ""
 
 def show_board():
-#	boardstr = ""
-#	for i in range(64):
-#		boardstrold = "][".join(board64[i])
-#		global boardstrnew 
-#		boardstr = boardstrnew + boardstrold
 	for z in range(1,9):
 		y = (z-1)*8
 		x = z*8
 		for i in range(y,x):
 			board64short.append(board64[i])
-			# return board64short
 			boardstrstart = "["
 			boardstrend = "]"
 			boardstrmid = ']['.join(map(str, board64short))
+		boardstrnew = ""
 		boardstrnew = boardstrstart+boardstrmid+boardstrend+"\n"
-		#return boardstrnew
 		global boardstr
-		boardstrold = boardstrnew
-		boardstr = boardstrold+boardstrnew
-		#boardstrnew = boardstrstart+boardstrmid+boardstrend+"\n"
-		# return boardstrnew
-	# return board64short
+		boardstr = boardstr+boardstrnew
+		board64short.clear()
 	return boardstr
-	# return x
-	# return i
+
 print(show_board())
 
-# print(' '.join(map(str, board64)))
-# print(board64[1])
 
