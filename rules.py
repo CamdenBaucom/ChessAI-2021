@@ -59,22 +59,19 @@ def upd_board_64120():
 move_convtr_64120_var1 = 0
 move_convtr_64120_var2 = 0
 
-def move_convtr_64120(movestart,moveend):
-	movestart -= 1
-	moveend -= 1
-	for i in range(movestart):
-		if i in (8,9,18,19,28,29,38,39,48,49,58,59):
+def move_convtr_64120(movestart):
+	for a in range(movestart):
+		if a in (8,9,18,19,28,29,38,39,48,49,58,59):
 			global move_convtr_64120_var1
 			move_convtr_64120_var1 += 1
-	for x in range(moveend):
-		if x in (8,9,18,19,28,29,38,39,48,49,58,59):
+	for b in range(movestart + move_convtr_64120_var1):
+		if b in (8,9,18,19,28,29,38,39,48,49,58,59,68,69):
 			global move_convtr_64120_var2
-			move_convtr_64120_var2 += 1
-	movestart = movestart + move_convtr_64120_var1 + 22
-	moveend = moveend + move_convtr_64120_var2 + 22
-	# print(move_convtr_64120_var2)
-	print(movestart)
-	print(moveend)
+			move_convtr_64120_var2 +=1
+	if (movestart + move_convtr_64120_var1) in (8,9,18,19,28,29,38,39,48,49,58,59,68,69):
+		move_convtr_64120_var2 += 2
+	movestart = movestart + move_convtr_64120_var2 + 21
+	return movestart
 
 def move(movestart,moveend):
 	movestart -= 1
@@ -91,9 +88,5 @@ def move_pawn_is_legal(movestart,moveend):
 		return False
 
 upd_board_12064()
-# move_pawn_is_legal(
-# show_board()
-move_convtr_64120(32,60)
-print(board64[60])
-print(board120[92])
-
+print(board64[58])
+print(board120[(move_convtr_64120(58))])
