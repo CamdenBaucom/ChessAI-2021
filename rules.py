@@ -1,3 +1,4 @@
+# CHECK ALL GLOBAL VARIABLE
 board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','r','n','b','q','k','b','n','r','-1',
@@ -48,6 +49,7 @@ def upd_board_12064():
 			global updboardcounter12064
 			board64[updboardcounter12064] = board120[index]
 			updboardcounter12064 += 1
+# CHECK ALL GLOABL VARIABLES
 
 def upd_board_64120():
 	for index, sqr in enumerate(board120):
@@ -71,6 +73,8 @@ def move_convtr_64120(movestart):
 	if (movestart + move_convtr_64120_var1) in (8,9,18,19,28,29,38,39,48,49,58,59,68,69):
 		move_convtr_64120_var2 += 2
 	movestart = movestart + move_convtr_64120_var2 + 21
+	move_convtr_64120_var1 = 0
+	move_convtr_64120_var2 = 0
 	return movestart
 
 def move(movestart,moveend):
@@ -80,13 +84,16 @@ def move(movestart,moveend):
 	board64[movestr] = 0
 
 def move_pawn_is_legal(movestart,moveend):
-	if board120[movestart] == 'p' or 'P':
-		if movestart + 10 == moveend:
-			if board120[moveend] == 0:
+	if board120[(move_convtr_64120(movestart))] == 'p' or 'P':
+		if movestart + 8 == moveend or movestart - 8 == moveend:
+			if board120[(move_convtr_64120(moveend))] == '0':
 				return True
+			else:
+				return False
+		else:
+			return False
 	else:
 		return False
 
 upd_board_12064()
-print(board64[58])
-print(board120[(move_convtr_64120(58))])
+print(move_pawn_is_legal(53,45))
