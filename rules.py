@@ -1,4 +1,3 @@
-# CHECK ALL GLOBAL VARIABLE
 board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','r','n','b','q','k','b','n','r','-1',
@@ -39,6 +38,10 @@ def show_board():
 		boardstr = boardstr+boardstrnew
 		board64short.clear()
 	print(boardstr)
+	boardstrmid = ""
+	boardstrnew = ""
+	boardstr = ""
+	board64short.clear()
 
 updboardcounter12064 = 0
 updboardcounter64120 = 0
@@ -49,7 +52,7 @@ def upd_board_12064():
 			global updboardcounter12064
 			board64[updboardcounter12064] = board120[index]
 			updboardcounter12064 += 1
-# CHECK ALL GLOABL VARIABLES
+	updboardcounter12064 = 0
 
 def upd_board_64120():
 	for index, sqr in enumerate(board120):
@@ -57,6 +60,7 @@ def upd_board_64120():
 			global updboardcounter64120
 			board120[index] = board64[updboardcounter64120]
 			updboardcounter64120 += 1
+	updboardcounter64120 = 0
 
 move_convtr_64120_var1 = 0
 move_convtr_64120_var2 = 0
@@ -77,23 +81,53 @@ def move_convtr_64120(movestart):
 	move_convtr_64120_var2 = 0
 	return movestart
 
+last_movestart = 0
+last_moveend = 0
+
 def move(movestart,moveend):
 	movestart -= 1
 	moveend -= 1
-	board64[moveend] = board64[movestart]
-	board64[movestr] = 0
+	if move_pawn_is_legal(movestart,moveend):
+		board64[moveend] = board64[movestart]
+		board64[movestart] = 0
+		print("Possible")
+		global last_movestart
+		last_movestart = movestart
+		global last_moveend
+		last_moveend = moveend
+	else:
+		print("Not possible")
+
+def move_is_legal(movestart,moveend):
+	if board120[(move_convtr_64120(movestart))] == 'p' or 'P':
+		move_pawn_is_legal(movestart,moveend)
+	elif board120[(move_convtr_64120(movestart))] == 'r' or 'R':
+		move_rook_is_legal(movestart,moveend)
+	elif board120[(move_convtr_64120(movestart))] == 'n' or 'N':
+		move_knight_is_legal(movestart,moveend)
+	elif board120[(move_convtr_64120(movestart))] == 'b' or 'B':
+		move_bishop_is_legal(movestart,moveend)
+	elif board120[(move_convtr_64120(movestart))] == 'q' or 'Q':
+		move_queen_is_legal(movestart,moveend)
+	elif board120[(move_convtr_64120(movestart))] == 'K' or 'K':
+		move_king_is_legal(movestart,moveend)
+	else:
+		return False
 
 def move_pawn_is_legal(movestart,moveend):
-	if board120[(move_convtr_64120(movestart))] == 'p' or 'P':
-		if movestart + 8 == moveend or movestart - 8 == moveend:
-			if board120[(move_convtr_64120(moveend))] == '0':
-				return True
-			else:
-				return False
+	if movestart == moveend + 8 or moveend - 8:
+		if board120[(move_convtr_64120(moveend))] == '0':
+			return True
 		else:
 			return False
 	else:
 		return False
 
+def move_rook_is_legal(movestart,moveend):
+	if (movestart-moveend) in (8,16,24,32,40,48,56,-8,-16,-24,-32,-40,-48,-56):
+		return True
+
+
 upd_board_12064()
-print(move_pawn_is_legal(53,45))
+# print(move_rook_is_legal(52,44))
+# show_board()
