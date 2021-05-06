@@ -109,7 +109,7 @@ def move_is_legal(movestart,moveend):
 		move_bishop_is_legal(movestart,moveend)
 	elif board120[(move_convtr_64120(movestart))] == 'q' or 'Q':
 		move_queen_is_legal(movestart,moveend)
-	elif board120[(move_convtr_64120(movestart))] == 'K' or 'K':
+	elif board120[(move_convtr_64120(movestart))] == 'k' or 'K':
 		move_king_is_legal(movestart,moveend)
 	else:
 		return False
@@ -120,6 +120,12 @@ def move_pawn_is_legal(movestart,moveend):
 			return True
 		else:
 			return False
+	elif (movestart == moveend + 16 or moveend -16) and ((board120[(move_convtr_64120(movestart) == 'p' and movestart in (8,9,10,11,12,13,14,15) or (board120[(move_convtr_64120(movestart))] == 'P' and movestart in (48,49,50,51,52,53,54,55))):
+		if hit_detec(movestart,moveend) == True:
+			return True
+		else:
+			return False
+# PAWNS TAKING DIAGONALLY
 	else:
 		return False
 
@@ -128,6 +134,8 @@ def move_rook_is_legal(movestart,moveend):
 		return True
 
 def hit_detec(movestart,moveend):
+	movestart -= 1
+	moveend -= 1
 	hit_detec_sign = (moveend-movestart) / abs(moveend-movestart)
 	hit_detec_sign = int(hit_detec_sign)
 	if abs(movestart-moveend) in (8,16,24,32,40,48,56,64):
@@ -140,14 +148,45 @@ def hit_detec(movestart,moveend):
 				hit_detec_horiz_bool = False
 			elif board120[(move_convtr_64120(movestart+(hit_detec_sign*hit_detec_horiz_between)))] == '0':
 				hit_detec_horiz_bool = True
-				print("yes")
 			else:
 				hit_detec_horiz_bool = False
 				return hit_detec_horiz_bool
 		return hit_detec_horiz_bool
+	elif (abs(movestart-moveend) in (1,2,3,4,5,6)) or (abs(movestart-moveend) == 7 and (movestart and moveend) in (0,8,16,24,32,40,48,56,7,15,23,31,39,47,55,63)):
+		hit_detec_vert_counter = abs(movestart-moveend) + 1
+		hit_detec_vert_counter = int(hit_detec_vert_counter)
+		hit_detec_vert_bool = False
+		for i in range(hit_detec_vert_counter):
+			print(i)
+			if i == 0:
+				hit_detec_vert_bool = False
+			elif board120[(move_convtr_64120(movestart+(hit_detec_sign*i)))] == '0':
+				hit_detec_vert_bool = True
+			else:
+				hit_detec_vert_bool = False
+				return hit_detec_vert_bool
+		return hit_detec_vert_bool
+	else:
+		if abs(movestart-moveend) in (7,14,21,28,35,42,49):
+			hit_detec_diag_counter = abs(((movestart-moveend) / 7)) + 1
+			hit_detec_diag_inc = 7
+		else:
+			hit_detec_diag_counter = abs(((movestart-moveend) / 9)) + 1
+			hit_detec_diag_inc = 9
+		hit_detec_diag_counter = int(hit_detec_diag_counter)
+		hit_detec_diag_bool = False
+		for i in range(hit_detec_diag_counter):
+			hit_detec_diag_between = i*hit_detec_diag_inc
+			if hit_detec_diag_between == 0:
+				hit_detec_diag_bool = False
+			elif board120[(move_convtr_64120(movestart+(hit_detec_sign*hit_detec_diag_between)))] == '0':
+				hit_detec_diag_bool = True
+			else:
+				hit_detec_diag_bool = False
+				return hit_detec_diag_bool
+		return hit_detec_diag_bool
 
-
-#upd_board_12064()
-print(hit_detec(14,46))
+upd_board_12064()
+print(hit_detec(9,45))
 # print(move_rook_is_legal(52,44))
 # show_board()
