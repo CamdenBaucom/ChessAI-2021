@@ -127,26 +127,27 @@ def move_rook_is_legal(movestart,moveend):
 	if (movestart-moveend) in (8,16,24,32,40,48,56,-8,-16,-24,-32,-40,-48,-56):
 		return True
 
-def hit_detec_horiz(movestart,moveend):
-	hit_detec_horiz_counter = abs(((movestart-moveend) / 8)) + 1
-	hit_detec_horiz_sign = (moveend-movestart) / abs(moveend-movestart)
-	hit_detec_horiz_sign = int(hit_detec_horiz_sign)
-	hit_detec_horiz_counter = int(hit_detec_horiz_counter)
-	hit_detec_horiz_bool = False
-	for i in range(hit_detec_horiz_counter):
-		hit_detec_horiz_between = i*8
-		print(hit_detec_horiz_sign)
-		if board120[(move_convtr_64120(movestart+(hit_detec_horiz_sign*hit_detec_horiz_between)))] == 0:
-			hit_detec_horiz_bool = True
-		elif hit_detec_horiz_between == 0:
-			hit_detec_horiz_bool = False
-		else:
-			hit_detec_horiz_bool = False
-			return hit_detec_horiz_bool
-	return hit_detec_horiz_bool
+def hit_detec(movestart,moveend):
+	hit_detec_sign = (moveend-movestart) / abs(moveend-movestart)
+	hit_detec_sign = int(hit_detec_sign)
+	if abs(movestart-moveend) in (8,16,24,32,40,48,56,64):
+		hit_detec_horiz_counter = abs(((movestart-moveend) / 8)) + 1
+		hit_detec_horiz_counter = int(hit_detec_horiz_counter)
+		hit_detec_horiz_bool = False
+		for i in range(hit_detec_horiz_counter):
+			hit_detec_horiz_between = i*8
+			if hit_detec_horiz_between == 0:
+				hit_detec_horiz_bool = False
+			elif board120[(move_convtr_64120(movestart+(hit_detec_sign*hit_detec_horiz_between)))] == '0':
+				hit_detec_horiz_bool = True
+				print("yes")
+			else:
+				hit_detec_horiz_bool = False
+				return hit_detec_horiz_bool
+		return hit_detec_horiz_bool
 
 
 #upd_board_12064()
-print(hit_detec_horiz(42,34))
+print(hit_detec(14,46))
 # print(move_rook_is_legal(52,44))
 # show_board()
