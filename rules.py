@@ -5,7 +5,7 @@ board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
-'-1','0','0','0','0','0','0','0','0','-1',
+'-1','p','0','0','0','0','0','0','0','-1',
 '-1','P','P','P','P','P','P','P','P','-1',
 '-1','R','N','B','Q','K','B','N','R','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
@@ -114,20 +114,34 @@ def move_is_legal(movestart,moveend):
 	else:
 		return False
 
+
 def move_pawn_is_legal(movestart,moveend):
-	if movestart == moveend + 8 or moveend - 8:
+	if board120[(move_convtr_64120(movestart))] == 'p':
+		pawn_move_direction = -1
+	else:
+		pawn_move_direction = 1
+	if movestart == moveend + (8*pawn_move_direction):
 		if board120[(move_convtr_64120(moveend))] == '0':
 			return True
 		else:
 			return False
-	elif (movestart == moveend + 16 or moveend -16) and ((board120[(move_convtr_64120(movestart) == 'p' and movestart in (8,9,10,11,12,13,14,15) or (board120[(move_convtr_64120(movestart))] == 'P' and movestart in (48,49,50,51,52,53,54,55))):
-		if hit_detec(movestart,moveend) == True:
+	elif (movestart == moveend + (16*pawn_move_direction)) and ((board120[(move_convtr_64120(movestart))] == 'p' and movestart in (8,9,10,11,12,13,14,15)) or (board120[(move_convtr_64120(movestart))] == 'P' and movestart in (48,49,50,51,52,53,54,55))):
+		if (hit_detec(movestart,moveend) == True):
 			return True
 		else:
 			return False
-# PAWNS TAKING DIAGONALLY
+	elif (movestart == (moveend + 7*pawn_move_direction) or (moveend + 9*pawn_move_direction)) and board120[(move_convtr_64120(moveend))] != 0 or -1:
+		if movestart not in (8,16,24,32,40,48,15,23,31,39,47,55):
+			return True
+		elif movestart == moveend + 7*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (15,23,31,39,47,55)) or (pawn_move_direction == 1 and movestart in (8,16,24,32,40,48))):
+			return True
+		elif movestart == moveend + 9*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (8,16,24,32,40,48)) or (pawn_move_direction == 1 and movestart in (15,23,31,39,47,55))):
+			return True
+		else:
+			return False
 	else:
 		return False
+
 
 def move_rook_is_legal(movestart,moveend):
 	if (movestart-moveend) in (8,16,24,32,40,48,56,-8,-16,-24,-32,-40,-48,-56):
@@ -187,6 +201,6 @@ def hit_detec(movestart,moveend):
 		return hit_detec_diag_bool
 
 upd_board_12064()
-print(hit_detec(9,45))
+print(move_pawn_is_legal(40,47))
 # print(move_rook_is_legal(52,44))
 # show_board()
