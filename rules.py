@@ -3,8 +3,8 @@ board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','r','n','b','q','k','b','n','r','-1',
 '-1','p','p','p','p','p','p','p','p','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
-'-1','0','0','0','0','0','0','0','R','-1',
-'-1','0','r','0','0','0','0','0','0','-1',
+'-1','0','0','0','0','n','0','0','R','-1',
+'-1','n','r','0','0','0','0','0','0','-1',
 '-1','P','0','0','0','0','0','0','0','-1',
 '-1','P','P','P','P','P','P','P','P','-1',
 '-1','R','N','B','Q','K','B','N','R','-1',
@@ -62,26 +62,10 @@ def upd_board_64120():
 			updboardcounter64120 += 1
 	updboardcounter64120 = 0
 
-move_convtr_64120_var1 = 0
-move_convtr_64120_var2 = 0
-
 def move_convtr_64120(movestart):
-	movestart += 1
-	for a in range(movestart):
-		if a in (8,9,18,19,28,29,38,39,48,49,58,59):
-			global move_convtr_64120_var1
-			move_convtr_64120_var1 += 1
-	for b in range(movestart + move_convtr_64120_var1):
-		if b in (8,9,18,19,28,29,38,39,48,49,58,59,68,69):
-			global move_convtr_64120_var2
-			move_convtr_64120_var2 +=1
-	print(move_convtr_64120_var2)
-#	movestart -= 1
-	if (movestart + move_convtr_64120_var2) in (8,9,18,19,28,29,38,39,48,49,58,59,68,69):
-		move_convtr_64120_var2 += 2
-	movestart = movestart + move_convtr_64120_var2 + 21
-	move_convtr_64120_var1 = 0
-	move_convtr_64120_var2 = 0
+	move_convtr_64120_var1 = movestart // 8
+	move_convtr_64120_var1 = int(move_convtr_64120_var1)
+	movestart = movestart + (2*move_convtr_64120_var1) + 21
 	return movestart
 
 def horiz_range(movestart):
@@ -146,7 +130,6 @@ def move_pawn_is_legal(movestart,moveend):
 		else:
 			return False
 	elif (movestart == (moveend + 7*pawn_move_direction) or (moveend + 9*pawn_move_direction)) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)):
-		print("very cool")
 		if movestart not in (8,16,24,32,40,48,15,23,31,39,47,55):
 			return True
 		elif movestart == moveend + 7*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (15,23,31,39,47,55)) or (pawn_move_direction == 1 and movestart in (8,16,24,32,40,48))):
@@ -168,9 +151,14 @@ def move_rook_is_legal(movestart,moveend):
 		return False
 
 def move_knight_is_legal(movestart,moveend):
-	if abs(movestart-moveend) in (6,10,15,17):
-#board120 logic
-		return True
+	if (abs(movestart-moveend) in (6,10,15,17)) and ((board120[(move_convtr_64120(moveend))] == '0') or (board120[(move_convtr_64120(moveend))] in (can_take(movestart)))):
+		move_knight_sign = -1*(abs(movestart-moveend)) / (movestart-moveend)
+		move_knight_board120_check = ((move_convtr_64120(movestart)) + (move_convtr_64120(abs(movestart-moveend))*move_knight_sign))
+		move_knight_board120_check = int(move_knight_board120_check)
+		if board120[move_knight_board120_check] != -1:
+			return True
+		else:
+			return False
 	else:
 		return False
 
@@ -235,14 +223,13 @@ def hit_detec(movestart,moveend):
 
 upd_board_12064()
 
-#print(move_is_legal(40,33))
+print(move_is_legal(32,49))
 #print(can_take(40))
 #print(move_convtr_64120(40))
-print(board120[(move_convtr_64120(40))])
-print(board120[(move_convtr_64120(33))])
+#print(board120[(move_convtr_64120(40))])
+#print(board120[(move_convtr_64120(33))])
 #print(board120[62])
 #print(board120[(move_convtr_64120(33))] in can_take(40))
 #print(move_convtr_64120(28))
 # print(move_rook_is_legal(52,44))
 # show_board()
-
