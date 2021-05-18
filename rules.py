@@ -3,9 +3,9 @@ board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','r','n','b','q','k','b','n','r','-1',
 '-1','p','p','p','p','p','p','p','p','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
-'-1','0','0','0','0','n','0','0','R','-1',
-'-1','n','r','0','0','0','0','0','0','-1',
-'-1','P','0','0','0','0','0','0','0','-1',
+'-1','0','0','0','0','0','0','0','0','-1',
+'-1','0','0','0','0','0','0','0','0','-1',
+'-1','0','0','0','0','0','0','0','0','-1',
 '-1','P','P','P','P','P','P','P','P','-1',
 '-1','R','N','B','Q','K','B','N','R','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
@@ -19,6 +19,8 @@ board64 = [ '0','1','2','3','4','5','6','7',
 '40','41','42','43','44','45','46','47',
 '48','49','50','51','52','53','54','55',
 '56','57','58','59','60','61','62','63']
+
+iswhitemove = True
 
 board64short = []
 boardstr = ""
@@ -75,41 +77,49 @@ def horiz_range(movestart):
 
 def can_take(movestart):
 	if board120[(move_convtr_64120(movestart))].islower() == True:
-		print("cool")
-		return ['P','R','N','B','Q','K']
+		return ['P','R','N','B','Q','K','0']
 	else:
-		print("notcool")
-		return ['p','r','n','b','q','k']
+		return ['p','r','n','b','q','k','0']
 
 last_movestart = 0
 last_moveend = 0
+old_movestart = []
+old_moveend = []
 
 def move(movestart,moveend):
-	if move_pawn_is_legal(movestart,moveend):
+	if move_is_legal(movestart,moveend) == True:
 		board64[moveend] = board64[movestart]
-		board64[movestart] = 0
+		board64[movestart] = '0'
 		print("Possible")
 		global last_movestart
 		last_movestart = movestart
 		global last_moveend
 		last_moveend = moveend
+		global old_movestart
+		old_movestart.append(movestart)
+		global old_moveend
+		old_moveend.append(moveend)
+		global iswhitemove
+		iswhitemove = not iswhitemove
 	else:
 		print("Not possible")
 
 def move_is_legal(movestart,moveend):
-	if board120[(move_convtr_64120(movestart))] in ('p','P'):
-		return move_pawn_is_legal(movestart,moveend)
-	elif board120[(move_convtr_64120(movestart))] in ('r','R'):
-		return move_rook_is_legal(movestart,moveend)
-	elif board120[(move_convtr_64120(movestart))] in ('n','N'):
-		print("good")
-		return move_knight_is_legal(movestart,moveend)
-	elif board120[(move_convtr_64120(movestart))] in ('b','B'):
-		return move_bishop_is_legal(movestart,moveend)
-	elif board120[(move_convtr_64120(movestart))] in ('q','Q'):
-		return move_queen_is_legal(movestart,moveend)
-	elif board120[(move_convtr_64120(movestart))] in ('k','K'):
-		return move_king_is_legal(movestart,moveend)
+	if (iswhitemove == True and (board120[(move_convtr_64120(movestart))] in ('P','R','N','B','Q','K'))) or (iswhitemove == False and (board120[(move_convtr_64120(movestart))] in ('p','r','n','b','q','k'))): 
+		if board120[(move_convtr_64120(movestart))] in ('p','P'):
+			return move_pawn_is_legal(movestart,moveend)
+		elif board120[(move_convtr_64120(movestart))] in ('r','R'):
+			return move_rook_is_legal(movestart,moveend)
+		elif board120[(move_convtr_64120(movestart))] in ('n','N'):
+			return move_knight_is_legal(movestart,moveend)
+		elif board120[(move_convtr_64120(movestart))] in ('b','B'):
+			return move_bishop_is_legal(movestart,moveend)
+		elif board120[(move_convtr_64120(movestart))] in ('q','Q'):
+			return move_queen_is_legal(movestart,moveend)
+		elif board120[(move_convtr_64120(movestart))] in ('k','K'):
+			return move_king_is_legal(movestart,moveend)
+		else:
+			return False
 	else:
 		return False
 
@@ -129,7 +139,7 @@ def move_pawn_is_legal(movestart,moveend):
 			return True
 		else:
 			return False
-	elif (movestart == (moveend + 7*pawn_move_direction) or (moveend + 9*pawn_move_direction)) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)):
+	elif (movestart == (moveend + 7*pawn_move_direction) or (moveend + 9*pawn_move_direction)) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)) and board120[(move_convtr_64120(moveend))] != '0':
 		if movestart not in (8,16,24,32,40,48,15,23,31,39,47,55):
 			return True
 		elif movestart == moveend + 7*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (15,23,31,39,47,55)) or (pawn_move_direction == 1 and movestart in (8,16,24,32,40,48))):
@@ -143,15 +153,15 @@ def move_pawn_is_legal(movestart,moveend):
 
 
 def move_rook_is_legal(movestart,moveend):
-	if abs(movestart-moveend) in (8,16,24,32,40,48,56) and hit_detec(movestart,moveend) == True:
+	if abs(movestart-moveend) in (8,16,24,32,40,48,56) and (hit_detec(movestart,moveend) == True) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
 		return True
-	elif moveend in horiz_range(movestart) and hit_detec(movestart, moveend) == True:
+	elif moveend in horiz_range(movestart) and (hit_detec(movestart, moveend) == True) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
 		return True
 	else:
 		return False
 
 def move_knight_is_legal(movestart,moveend):
-	if (abs(movestart-moveend) in (6,10,15,17)) and ((board120[(move_convtr_64120(moveend))] == '0') or (board120[(move_convtr_64120(moveend))] in (can_take(movestart)))):
+	if (abs(movestart-moveend) in (6,10,15,17)) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
 		move_knight_sign = -1*(abs(movestart-moveend)) / (movestart-moveend)
 		move_knight_board120_check = ((move_convtr_64120(movestart)) + (move_convtr_64120(abs(movestart-moveend))*move_knight_sign))
 		move_knight_board120_check = int(move_knight_board120_check)
@@ -163,24 +173,29 @@ def move_knight_is_legal(movestart,moveend):
 		return False
 
 
+def move_bishop_is_legal(movestart,moveend):
+	if abs(movestart-moveend) in (7,14,21,28,35,42,49,9,18,27,36,45,54,63) and (hit_detec(movestart,moveend) == True) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
+		return True
+	else:
+		return False
 
-
-
-
-
-
+def move_queen_is_legal(movestart,moveend):
+	if (move_bishop_is_legal(movestart,moveend) == True) or (move_rook_is_legal(movestart,moveend) == True):
+		return True
+	else:
+		return False
 
 def hit_detec(movestart,moveend):
 	hit_detec_sign = (moveend-movestart) / abs(moveend-movestart)
 	hit_detec_sign = int(hit_detec_sign)
 	if abs(movestart-moveend) in (8,16,24,32,40,48,56,64):
-		hit_detec_vert_counter = abs(((movestart-moveend) / 8)) + 1
+		hit_detec_vert_counter = abs(((movestart-moveend) / 8))
 		hit_detec_vert_counter = int(hit_detec_vert_counter)
 		hit_detec_vert_bool = False
 		for i in range(hit_detec_vert_counter):
 			hit_detec_vert_between = i*8
 			if hit_detec_vert_between == 0:
-				hit_detec_vert_bool = False
+				hit_detec_vert_bool = True
 			elif board120[(move_convtr_64120(movestart+(hit_detec_sign*hit_detec_vert_between)))] == '0':
 				hit_detec_vert_bool = True
 			else:
@@ -188,32 +203,31 @@ def hit_detec(movestart,moveend):
 				return hit_detec_vert_bool
 		return hit_detec_vert_bool
 	elif moveend in horiz_range(movestart):
-		hit_detec_horiz_counter = abs(movestart-moveend) + 1
+		hit_detec_horiz_counter = abs(movestart-moveend)
 		hit_detec_horiz_counter = int(hit_detec_horiz_counter)
 		hit_detec_horiz_bool = False
 		for i in range(hit_detec_horiz_counter):
 			if i == 0:
-				hit_detec_horiz_bool = False
+				hit_detec_horiz_bool = True
 			elif board120[(move_convtr_64120(movestart+(hit_detec_sign*i)))] == '0':
 				hit_detec_horiz_bool = True
 			else:
 				hit_detec_horiz_bool = False
 				return hit_detec_horiz_bool
 		return hit_detec_horiz_bool
-#Revamp with board120 11 and 9
 	else:
 		if abs(movestart-moveend) in (7,14,21,28,35,42,49):
-			hit_detec_diag_counter = abs(((movestart-moveend) / 7)) + 1
+			hit_detec_diag_counter = abs(((movestart-moveend) / 7))
 			hit_detec_diag_inc = 9
 		else:
-			hit_detec_diag_counter = abs(((movestart-moveend) / 9)) + 1
+			hit_detec_diag_counter = abs(((movestart-moveend) / 9))
 			hit_detec_diag_inc = 11
 		hit_detec_diag_counter = int(hit_detec_diag_counter)
 		hit_detec_diag_bool = False
 		for i in range(hit_detec_diag_counter):
 			hit_detec_diag_between = i*hit_detec_diag_inc
 			if hit_detec_diag_between == 0:
-				hit_detec_diag_bool = False
+				hit_detec_diag_bool = True
 			elif board120[(move_convtr_64120(movestart)+(hit_detec_sign*hit_detec_diag_between))] == '0':
 				hit_detec_diag_bool = True
 			else:
@@ -221,9 +235,22 @@ def hit_detec(movestart,moveend):
 				return hit_detec_diag_bool
 		return hit_detec_diag_bool
 
-upd_board_12064()
+def play():
+	while True:
+		show_board()
+		x = input('Starting move:\n')
+		y = input('Ending move:\n')
+		x = int(x)
+		y = int(y)
+		move(x,y)
+		upd_board_64120()
 
-print(move_is_legal(32,49))
+
+upd_board_12064()
+play()
+
+#print(move_is_legal(61,16))
+#print(hit_detec(37,16))
 #print(can_take(40))
 #print(move_convtr_64120(40))
 #print(board120[(move_convtr_64120(40))])
