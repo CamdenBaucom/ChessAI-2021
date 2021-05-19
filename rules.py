@@ -80,47 +80,48 @@ def horiz_range(movestart):
 
 def board_notation_convtr(movestart):
 	board_notation_char = [char for char in movestart]
-	#board_notation_counter = 0
+ 	#board_notation_counter = 0
 	if 'a' in board_notation_char or 'A' in board_notation_char:
 		board_notation_counter = 7
 	elif 'b' in board_notation_char or 'B' in board_notation_char:
 		board_notation_counter = 6
-        elif 'c' in board_notation_char or 'C' in board_notation_char:
-                board_notation_counter = 5
-        elif 'd' in board_notation_char or 'D' in board_notation_char:
-                board_notation_counter = 4
-        elif 'e' in board_notation_char or 'E' in board_notation_char:
-                board_notation_counter = 3
-        elif 'f' in board_notation_char or 'F' in board_notation_char:
-                board_notation_counter = 2
-        elif 'g' in board_notation_char or 'G' in board_notation_char:
-                board_notation_counter = 1
+	elif 'c' in board_notation_char or 'C' in board_notation_char:
+		board_notation_counter = 5
+	elif 'd' in board_notation_char or 'D' in board_notation_char:
+		board_notation_counter = 6
+	elif 'e' in board_notation_char or 'E' in board_notation_char:
+		board_notation_counter = 3
+	elif 'f' in board_notation_char or 'F' in board_notation_char:
+		board_notation_counter = 2
+	elif 'g' in board_notation_char or 'G' in board_notation_char:
+		board_notation_counter = 1
 	elif 'h' in board_notation_char or 'H' in board_notation_char:
 		board_notation_counter = 0
-        else:
+	else:
 		return False
-        if '1' in board_notation_char:
-        elif '2' in board_notation_char:
-                board_notation_counter += 8
-        elif '3' in board_notation_char:
-                board_notation_counter += 16
-        elif '4' in board_notation_char:
-                board_notation_counter += 24
-        elif '5' in board_notation_char:
-                board_notation_counter += 32
-        elif '6' in board_notation_char:
-                board_notation_counter += 40
-        elif '7' in board_notation_char:
-                board_notation_counter += 48
+	if '1' in board_notation_char:
+		board_notation_counter += 0
+	elif '2' in board_notation_char:
+		board_notation_counter += 8
+	elif '3' in board_notation_char:
+		board_notation_counter += 16
+	elif '4' in board_notation_char:
+		board_notation_counter += 24
+	elif '5' in board_notation_char:
+		board_notation_counter += 32
+	elif '6' in board_notation_char:
+		board_notation_counter += 40
+	elif '7' in board_notation_char:
+		board_notation_counter += 48
 	elif '8' in board_notation_char:
 		board_notation_counter += 56
-        else:
-                return False
+	else:
+		return False
+	board_notation_counter = 63-board_notation_counter
+	return board_notation_counter
 
 
-
-
-	return board_notation_char
+	#return board_notation_char
 
 def can_take(movestart):
 	if board120[(move_convtr_64120(movestart))].islower() == True:
@@ -287,15 +288,15 @@ def play():
 		show_board()
 		x = input('Starting move:\n')
 		y = input('Ending move:\n')
-		x = int(x)
-		y = int(y)
+		x = board_notation_convtr(x)
+		y = board_notation_convtr(y)
 		move(x,y)
 		upd_board_64120()
 
 
-#upd_board_12064()
-#play()
-print(board_notation_to_square_numb('A3'))
+upd_board_12064()
+play()
+#print(board_notation_convtr('A3'))
 
 #print(move_is_legal(61,16))
 #print(hit_detec(37,16))
