@@ -153,7 +153,7 @@ def move(movestart,moveend):
 		print("Not possible")
 
 def move_is_legal(movestart,moveend):
-	if (iswhitemove == True and (board120[(move_convtr_64120(movestart))] in ('P','R','N','B','Q','K'))) or (iswhitemove == False and (board120[(move_convtr_64120(movestart))] in ('p','r','n','b','q','k'))): 
+	if (movestart != moveend) and (iswhitemove == True and (board120[(move_convtr_64120(movestart))] in ('P','R','N','B','Q','K'))) or (iswhitemove == False and (board120[(move_convtr_64120(movestart))] in ('p','r','n','b','q','k'))):
 		if board120[(move_convtr_64120(movestart))] in ('p','P'):
 			return move_pawn_is_legal(movestart,moveend)
 		elif board120[(move_convtr_64120(movestart))] in ('r','R'):
@@ -179,20 +179,25 @@ def move_pawn_is_legal(movestart,moveend):
 		pawn_move_direction = 1
 	if movestart == moveend + (8*pawn_move_direction):
 		if board120[(move_convtr_64120(moveend))] == '0':
+			#print("1")
 			return True
 		else:
 			return False
-	elif (movestart == moveend + (16*pawn_move_direction)) and ((board120[(move_convtr_64120(movestart))] == 'p' and movestart in (8,9,10,11,12,13,14,15)) or (board120[(move_convtr_64120(movestart))] == 'P' and movestart in (48,49,50,51,52,53,54,55))):
+	elif (movestart == moveend + (16*pawn_move_direction)) and (((pawn_move_direction == -1) and (movestart in (8,9,10,11,12,13,14,15))) or ((pawn_move_direction == 1) and (movestart in (48,49,50,51,52,53,54,55)))):
 		if (hit_detec(movestart,moveend) == True):
+			#print("2")
 			return True
 		else:
 			return False
-	elif (movestart == (moveend + 7*pawn_move_direction) or (moveend + 9*pawn_move_direction)) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)) and board120[(move_convtr_64120(moveend))] != '0':
+	elif (movestart == (moveend + 7*pawn_move_direction) or movestart == (moveend + 9*pawn_move_direction)) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)) and board120[(move_convtr_64120(moveend))] != '0':
 		if movestart not in (8,16,24,32,40,48,15,23,31,39,47,55):
+			#print("3")
 			return True
 		elif movestart == moveend + 7*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (15,23,31,39,47,55)) or (pawn_move_direction == 1 and movestart in (8,16,24,32,40,48))):
+			#print("4")
 			return True
 		elif movestart == moveend + 9*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (8,16,24,32,40,48)) or (pawn_move_direction == 1 and movestart in (15,23,31,39,47,55))):
+			#print("5")
 			return True
 		else:
 			return False
@@ -232,6 +237,19 @@ def move_queen_is_legal(movestart,moveend):
 		return True
 	else:
 		return False
+
+def move_king_is_legal(movestart,moveend):
+	if abs(movestart-moveend) in (1,2,7,8,9):
+		move_king_sign = -abs(movestart-moveend) / (movestart-moveend)
+		move_king_diff = abs(movestart-moveend)
+		move_king_sign = int(move_king_sign)
+		move_king_diff = int(move_king_diff)
+		if abs(movestart-moveend) in (7,8,9):
+			move_king_diff += 2
+		if board120[(move_convtr_64120(movestart))+(move_king_diff*move_king_sign)] in (can_take(movestart)):
+			return True
+		else:
+			return False
 
 def hit_detec(movestart,moveend):
 	hit_detec_sign = (moveend-movestart) / abs(moveend-movestart)
@@ -283,33 +301,39 @@ def hit_detec(movestart,moveend):
 				return hit_detec_diag_bool
 		return hit_detec_diag_bool
 
-eligble_move_start = []
-eligble_move_end = []
-posible_move_start = []
+#eligble_move_start = []
+#eligble_move_end = []
+#possible_move_start = []
 
 def eligble_moves():
-	posible_move_start.clear()
+	eligble_move_end = []
+	eligble_move_start = []
+	possible_move_start = []
 	if iswhitemove == True:
 		for i in range(64):
 			if board120[(move_convtr_64120(i))] in ('P','R','N','B','Q','K'):
-				posible_move_start.append(i)
+				possible_move_start.append(i)
 	else:
 		for i in range(64):
 			if board120[(move_convtr_64120(i))] in ('p','r','n','b','q','k'):
-				posible_move_start.append(i)
-	while len(posible_move_start) > 0:
-		test_posible_move_start = posible_move_start.pop(0)
+				possible_move_start.append(i)
+	while len(possible_move_start) > 0:
+		test_possible_move_start = possible_move_start.pop(0)
 		for x in range(64):
-			if (move_is_legal(test_posible_move_start,x)) == True:
-				eligble_move_start.append(test_possible_move_start)
-				eligble_move_start.append(x)
-	return eligble_move_start
-	#return posible_move_start
+			if x != test_possible_move_start:
+				if (move_is_legal(test_possible_move_start,x)) == True:
+					eligble_move_start.append(test_possible_move_start)
+					eligble_move_end.append(x)
+	print(eligble_move_start)
+	print(eligble_move_end)
+	#return eligble_move_start
+	#return possible_move_start
+
 
 
 def play():
 	while True:
-		print(eligble_moves())
+		eligble_moves()
 		show_board()
 		x = input('Starting move:\n')
 		y = input('Ending move:\n')
@@ -317,14 +341,15 @@ def play():
 		y = board_notation_convtr(y)
 		move(x,y)
 		upd_board_64120()
+		#eligble_moves()
 
 
 upd_board_12064()
 #print(eligble_moves())
 play()
 #print(board_notation_convtr('A3'))
+#move_is_legal(49,6)
 
-#print(move_is_legal(61,16))
 #print(hit_detec(37,16))
 #print(can_take(40))
 #print(move_convtr_64120(40))
