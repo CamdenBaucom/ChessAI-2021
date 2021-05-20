@@ -2,12 +2,12 @@ board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','r','n','b','q','k','b','n','r','-1',
 '-1','p','p','p','p','p','p','p','p','-1',
-'-1','0','0','0','0','0','0','0','0','-1',
+'-1','0','0','0','K','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','P','P','P','P','P','P','P','P','-1',
-'-1','R','N','B','Q','K','B','N','R','-1',
+'-1','R','N','B','Q','0','B','N','R','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1']
 
@@ -131,11 +131,14 @@ def can_take(movestart):
 
 last_movestart = 0
 last_moveend = 0
+last_piece_taken = ''
 old_movestart = []
 old_moveend = []
 
 def move(movestart,moveend):
 	if move_is_legal(movestart,moveend) == True:
+		global last_piece_taken
+		last_piece_taken = board120[move_convtr_64120(moveend)]
 		board64[moveend] = board64[movestart]
 		board64[movestart] = '0'
 		print("Possible")
@@ -151,6 +154,10 @@ def move(movestart,moveend):
 		iswhitemove = not iswhitemove
 	else:
 		print("Not possible")
+
+def unmove():
+	board64[last_movestart] = board64[last_moveend]
+	board64[last_moveend] = last_piece_taken
 
 def move_is_legal(movestart,moveend):
 	if (movestart != moveend) and (iswhitemove == True and (board120[(move_convtr_64120(movestart))] in ('P','R','N','B','Q','K'))) or (iswhitemove == False and (board120[(move_convtr_64120(movestart))] in ('p','r','n','b','q','k'))):
@@ -345,6 +352,16 @@ def both_eligible_moves():
 	iswhitemove = not iswhitemove
 	eligible_moves()
 
+def opp_eligible_moves():
+	global iswhitemove
+	iswhitemove =  not iswhitemove
+	eligible_moves()
+	global opp_eligible_move_start
+	global opp_eligible_move_end
+	opp_eligible_move_start = eligible_move_start
+	opp_eligible_move_end = eligible_move_end
+	iswhitemove = not iswhitemove
+
 def in_check():
 	global iswhitemove
 	if iswhitemove == True:
@@ -362,7 +379,22 @@ def in_check():
 		in_check = False
 	return in_check
 
-
+def in_check_moves():
+	global in_check_eligible_move_start
+	global in_check_eligible_move_end
+	in_check_eligible_move_start = []
+	in_check_eligible_move_end = []
+	eligible_moves()
+	in_check_possible_eligible_move_start = eligible_move_start
+	in_check_possible_eligible_move_end = eligible_move_end
+	while len(in_check_possible_eligible_move_start) > 0:
+		test_in_check_possible_eligible_move_start = in_check_possible_eligible_move_start.pop(0)
+		test_in_check_possible_eligible_move_end = in_check_possible_eligible_move_end.pop(0)
+		move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)
+		if in_check() == False:
+			in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
+			in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
+		unmove()
 def play():
 	while True:
 		both_eligible_moves()
@@ -382,9 +414,13 @@ def play():
 		#eligible_moves()
 
 
-upd_board_12064()
+upd_board_12064
+opp_eligible_moves()
+in_check_moves()
+print(in_check_eligible_move_start)
+print(in_check_eligible_move_end)
 #print(eligble_moves())
-play()
+#play()
 #print(board_notation_convtr('A3'))
 #move_is_legal(49,6)
 
