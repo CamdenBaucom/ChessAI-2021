@@ -88,7 +88,7 @@ def board_notation_convtr(movestart):
 	elif 'c' in board_notation_char or 'C' in board_notation_char:
 		board_notation_counter = 5
 	elif 'd' in board_notation_char or 'D' in board_notation_char:
-		board_notation_counter = 6
+		board_notation_counter = 4
 	elif 'e' in board_notation_char or 'E' in board_notation_char:
 		board_notation_counter = 3
 	elif 'f' in board_notation_char or 'F' in board_notation_char:
@@ -283,8 +283,33 @@ def hit_detec(movestart,moveend):
 				return hit_detec_diag_bool
 		return hit_detec_diag_bool
 
+eligble_move_start = []
+eligble_move_end = []
+posible_move_start = []
+
+def eligble_moves():
+	posible_move_start.clear()
+	if iswhitemove == True:
+		for i in range(64):
+			if board120[(move_convtr_64120(i))] in ('P','R','N','B','Q','K'):
+				posible_move_start.append(i)
+	else:
+		for i in range(64):
+			if board120[(move_convtr_64120(i))] in ('p','r','n','b','q','k'):
+				posible_move_start.append(i)
+	while len(posible_move_start) > 0:
+		test_posible_move_start = posible_move_start.pop(0)
+		for x in range(64):
+			if (move_is_legal(test_posible_move_start,x)) == True:
+				eligble_move_start.append(test_possible_move_start)
+				eligble_move_start.append(x)
+	return eligble_move_start
+	#return posible_move_start
+
+
 def play():
 	while True:
+		print(eligble_moves())
 		show_board()
 		x = input('Starting move:\n')
 		y = input('Ending move:\n')
@@ -295,6 +320,7 @@ def play():
 
 
 upd_board_12064()
+#print(eligble_moves())
 play()
 #print(board_notation_convtr('A3'))
 
