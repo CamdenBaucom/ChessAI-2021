@@ -216,9 +216,9 @@ def move_rook_is_legal(movestart,moveend):
 def move_knight_is_legal(movestart,moveend):
 	if (abs(movestart-moveend) in (6,10,15,17)) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
 		move_knight_sign = -1*(abs(movestart-moveend)) / (movestart-moveend)
-		move_knight_board120_check = ((move_convtr_64120(movestart)) + (move_convtr_64120(abs(movestart-moveend))*move_knight_sign))
+		move_knight_board120_check = ((move_convtr_64120(movestart)) + (((abs(movestart-moveend))+(((abs(movestart-moveend)) // 6) * 2))*move_knight_sign))
 		move_knight_board120_check = int(move_knight_board120_check)
-		if board120[move_knight_board120_check] != -1:
+		if board120[move_knight_board120_check] not in ('-1'):
 			return True
 		else:
 			return False
@@ -294,8 +294,15 @@ def hit_detec(movestart,moveend):
 			hit_detec_diag_between = i*hit_detec_diag_inc
 			if hit_detec_diag_between == 0:
 				hit_detec_diag_bool = True
-			elif board120[(move_convtr_64120(movestart)+(hit_detec_sign*hit_detec_diag_between))] == '0':
+			elif board120[(move_convtr_64120(movestart))+(hit_detec_sign*hit_detec_diag_between)] == '0':
 				hit_detec_diag_bool = True
+				if (i+1 == hit_detec_diag_counter):
+					hit_detec_diag_between += hit_detec_diag_inc
+					if board120[(move_convtr_64120(movestart))+(hit_detec_sign*hit_detec_diag_between)] in (can_take(movestart)):
+						hit_detec_diag_bool = True
+					else:
+						hit_detec_diag_bool = False
+						return hit_detec_diag_bool
 			else:
 				hit_detec_diag_bool = False
 				return hit_detec_diag_bool
