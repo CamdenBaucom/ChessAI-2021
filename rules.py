@@ -308,13 +308,11 @@ def hit_detec(movestart,moveend):
 				return hit_detec_diag_bool
 		return hit_detec_diag_bool
 
-#eligble_move_start = []
-#eligble_move_end = []
-#possible_move_start = []
-
-def eligble_moves():
-	eligble_move_end = []
-	eligble_move_start = []
+def eligible_moves():
+	global eligible_move_end
+	global eligible_move_start
+	eligible_move_end = []
+	eligible_move_start = []
 	possible_move_start = []
 	if iswhitemove == True:
 		for i in range(64):
@@ -329,18 +327,51 @@ def eligble_moves():
 		for x in range(64):
 			if x != test_possible_move_start:
 				if (move_is_legal(test_possible_move_start,x)) == True:
-					eligble_move_start.append(test_possible_move_start)
-					eligble_move_end.append(x)
-	print(eligble_move_start)
-	print(eligble_move_end)
+					eligible_move_start.append(test_possible_move_start)
+					eligible_move_end.append(x)
+	#global eligble_move_start
+	#global eligble_move_end
 	#return eligble_move_start
 	#return possible_move_start
 
+def both_eligible_moves():
+	global iswhitemove
+	iswhitemove = not iswhitemove
+	eligible_moves()
+	global opp_eligible_move_start
+	global opp_eligible_move_end
+	opp_eligible_move_start = eligible_move_start
+	opp_eligible_move_end = eligible_move_end
+	iswhitemove = not iswhitemove
+	eligible_moves()
+
+def in_check():
+	global iswhitemove
+	if iswhitemove == True:
+		for i in range(64):
+			if board120[move_convtr_64120(i)] == 'K':
+				king_pos = i
+	else:
+		for i in range(64):
+			if board120[move_convtr_64120(i)] == 'k':
+				king_pos = i
+	if king_pos in (opp_eligible_move_end):
+		in_check = True
+		return in_check
+	else:
+		in_check = False
+	return in_check
 
 
 def play():
 	while True:
-		eligble_moves()
+		both_eligible_moves()
+		print(eligible_move_start)
+		print(eligible_move_end)
+		print("\n")
+		print(opp_eligible_move_start)
+		print(opp_eligible_move_end)
+		print(in_check())
 		show_board()
 		x = input('Starting move:\n')
 		y = input('Ending move:\n')
@@ -348,7 +379,7 @@ def play():
 		y = board_notation_convtr(y)
 		move(x,y)
 		upd_board_64120()
-		#eligble_moves()
+		#eligible_moves()
 
 
 upd_board_12064()
