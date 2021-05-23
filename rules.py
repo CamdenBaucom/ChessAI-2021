@@ -398,13 +398,14 @@ def in_check_moves():
 	while len(in_check_possible_eligible_move_start) > 0:
 		test_in_check_possible_eligible_move_start = in_check_possible_eligible_move_start.pop(0)
 		test_in_check_possible_eligible_move_end = in_check_possible_eligible_move_end.pop(0)
-		print(test_in_check_possible_eligible_move_start)
-		print(test_in_check_possible_eligible_move_end)
+		#print(test_in_check_possible_eligible_move_start)
+		#print(test_in_check_possible_eligible_move_end)
 		move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)
 		upd_board_64120()
 		#show_board()
 		#eligible_moves()
 		iswhitemove = not iswhitemove
+		both_eligible_moves()
 		#in_check()
 		#iswhitemove = not iswhitemove
 		#if in_check() == False:
@@ -417,7 +418,7 @@ def in_check_moves():
 		iswhitemove = not iswhitemove
 		unmove()
 		upd_board_64120
-		show_board()
+		#show_board()
 
 def play():
 	while True:
@@ -425,8 +426,8 @@ def play():
 		print(eligible_move_start)
 		print(eligible_move_end)
 		print("\n")
-		print(opp_eligible_move_start)
-		print(opp_eligible_move_end)
+		#print(opp_eligible_move_start)
+		#print(opp_eligible_move_end)
 		print(in_check())
 		show_board()
 		x = input('Starting move:\n')
@@ -434,13 +435,17 @@ def play():
 		x = board_notation_convtr(x)
 		y = board_notation_convtr(y)
 		move(x,y)
-		print("Are you in check?" + in_check)
 		upd_board_64120()
+		both_eligible_moves()
+		print("Are you in check?")
+		print(in_check())
+		print(king_pos)
+		#upd_board_64120()
 		#eligible_moves()
 
 
 upd_board_12064()
-opp_eligible_moves()
+#opp_eligible_moves()
 #print(in_check())
 #in_check_moves()
 
