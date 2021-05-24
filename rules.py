@@ -2,10 +2,10 @@ board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','r','n','b','q','k','b','n','r','-1',
 '-1','p','p','p','p','p','p','p','p','-1',
-'-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','K','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
-'-1','0','0','b','0','0','0','0','0','-1',
+'-1','0','0','0','0','0','0','0','0','-1',
+'-1','0','0','0','0','0','0','0','0','-1',
 '-1','P','P','P','P','P','P','P','P','-1',
 '-1','R','N','B','Q','0','B','N','R','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
@@ -326,6 +326,8 @@ def eligible_moves():
 	eligible_move_end = []
 	eligible_move_start = []
 	possible_move_start = []
+	test_possible_move_start = []
+	possible_move_start = []
 	if iswhitemove == True:
 		for i in range(64):
 			if board120[(move_convtr_64120(i))] in ('P','R','N','B','Q','K'):
@@ -363,6 +365,8 @@ def opp_eligible_moves():
 	eligible_moves()
 	global opp_eligible_move_start
 	global opp_eligible_move_end
+	opp_eligible_move_start.clear()
+	opp_eligible_move_end.clear()
 	opp_eligible_move_start = eligible_move_start
 	opp_eligible_move_end = eligible_move_end
 	iswhitemove = not iswhitemove
@@ -378,12 +382,13 @@ def in_check():
 		for i in range(64):
 			if board120[move_convtr_64120(i)] == 'k':
 				king_pos = i
+	opp_eligible_moves()
 	if king_pos in (opp_eligible_move_end):
 		in_check = True
 		return in_check
 	else:
 		in_check = False
-	return in_check
+		return in_check
 
 def in_check_moves():
 	global in_check_eligible_move_start
@@ -402,10 +407,29 @@ def in_check_moves():
 		#print(test_in_check_possible_eligible_move_end)
 		move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)
 		upd_board_64120()
+
+#		if iswhitemove == False:
+#			for i in range(64)
+
+		iswhitemove = not iswhitemove
+		#in_check()
+		if (in_check()) == False:
+			in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
+			in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
+		iswhitemove = not iswhitemove
+		eligible_moves()
+		print(eligible_move_end)
+		#iswhitemove = not iswhitemove
+		unmove()
+		upd_board_64120()
+		#eligible_moves()
+		#print(eligible_move_start)
+
+'''
 		#show_board()
 		#eligible_moves()
 		iswhitemove = not iswhitemove
-		both_eligible_moves()
+		#both_eligible_moves()
 		#in_check()
 		#iswhitemove = not iswhitemove
 		#if in_check() == False:
@@ -416,8 +440,10 @@ def in_check_moves():
 			in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
 			in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
 		iswhitemove = not iswhitemove
-		unmove()
-		upd_board_64120
+		print(opp_eligible_move_start)
+'''
+		#unmove()
+		#upd_board_64120
 		#show_board()
 
 def play():
@@ -437,9 +463,9 @@ def play():
 		move(x,y)
 		upd_board_64120()
 		both_eligible_moves()
-		print("Are you in check?")
-		print(in_check())
-		print(king_pos)
+		#print("Are you in check?")
+		#print(in_check())
+		#print(king_pos)
 		#upd_board_64120()
 		#eligible_moves()
 
