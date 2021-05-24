@@ -2,12 +2,12 @@ board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','r','n','b','q','k','b','n','r','-1',
 '-1','p','p','p','p','p','p','p','p','-1',
-'-1','0','0','0','K','0','0','0','0','-1',
+'-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','P','P','P','P','P','P','P','P','-1',
-'-1','R','N','B','Q','0','B','N','R','-1',
+'-1','R','N','B','Q','K','B','N','R','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1']
 
@@ -135,13 +135,13 @@ last_piece_taken = ''
 old_movestart = []
 old_moveend = []
 
-def move(movestart,moveend):
+def test_move(movestart,moveend):
 	if move_is_legal(movestart,moveend) == True:
 		global last_piece_taken
 		last_piece_taken = board64[moveend]
 		board64[moveend] = board64[movestart]
 		board64[movestart] = '0'
-		print("Possible")
+		#print("Possible")
 		global last_movestart
 		last_movestart = movestart
 		global last_moveend
@@ -154,6 +154,48 @@ def move(movestart,moveend):
 		iswhitemove = not iswhitemove
 	else:
 		print("Not possible")
+
+def move(movestart,moveend):
+	if move_is_legal(movestart,moveend) == True:
+		if (in_check()) == False:
+			global last_piece_taken
+			last_piece_taken = board64[moveend]
+			board64[moveend] = board64[movestart]
+			board64[movestart] = '0'
+			print("Possible")
+			global last_movestart
+			last_movestart = movestart
+			global last_moveend
+			last_moveend = moveend
+			global old_movestart
+			old_movestart.append(movestart)
+			global old_moveend
+			old_moveend.append(moveend)
+			global iswhitemove
+			iswhitemove = not iswhitemove
+		else:
+			in_check_moves()
+			if ((movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end))):
+				#global last_piece_taken
+				last_piece_taken = board64[moveend]
+				board64[moveend] = board64[movestart]
+				board64[movestart] = '0'
+				print("Possible")
+				#global last_movestart
+				last_movestart = movestart
+				#global last_moveend
+				last_moveend = moveend
+				#global old_movestart
+				old_movestart.append(movestart)
+				#global old_moveend
+				old_moveend.append(moveend)
+				#global iswhitemove
+				iswhitemove = not iswhitemove
+			else:
+				print("Not possible")
+	else:
+		print("Not possible")
+
 
 def unmove():
 	global last_movestart
@@ -399,13 +441,13 @@ def in_check_moves():
 	both_eligible_moves()
 	in_check_possible_eligible_move_start = eligible_move_start
 	in_check_possible_eligible_move_end = eligible_move_end
-	print(len(in_check_possible_eligible_move_end))
+#	print(len(in_check_possible_eligible_move_end))
 	while len(in_check_possible_eligible_move_start) > 0:
 		test_in_check_possible_eligible_move_start = in_check_possible_eligible_move_start.pop(0)
 		test_in_check_possible_eligible_move_end = in_check_possible_eligible_move_end.pop(0)
 		#print(test_in_check_possible_eligible_move_start)
 		#print(test_in_check_possible_eligible_move_end)
-		move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)
+		test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)
 		upd_board_64120()
 
 #		if iswhitemove == False:
@@ -418,7 +460,7 @@ def in_check_moves():
 			in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
 		iswhitemove = not iswhitemove
 		eligible_moves()
-		print(eligible_move_end)
+#		print(eligible_move_end)
 		#iswhitemove = not iswhitemove
 		unmove()
 		upd_board_64120()
@@ -449,12 +491,12 @@ def in_check_moves():
 def play():
 	while True:
 		both_eligible_moves()
-		print(eligible_move_start)
-		print(eligible_move_end)
-		print("\n")
+#		print(eligible_move_start)
+#		print(eligible_move_end)
+#		print("\n")
 		#print(opp_eligible_move_start)
 		#print(opp_eligible_move_end)
-		print(in_check())
+#		print(in_check())
 		show_board()
 		x = input('Starting move:\n')
 		y = input('Ending move:\n')
@@ -462,7 +504,7 @@ def play():
 		y = board_notation_convtr(y)
 		move(x,y)
 		upd_board_64120()
-		both_eligible_moves()
+#		both_eligible_moves()
 		#print("Are you in check?")
 		#print(in_check())
 		#print(king_pos)
@@ -471,6 +513,7 @@ def play():
 
 
 upd_board_12064()
+play()
 #opp_eligible_moves()
 #print(in_check())
 #in_check_moves()
@@ -479,9 +522,9 @@ upd_board_12064()
 #print(eligible_move_start)
 #print(eligible_move_end)
 
-in_check_moves()
-print(in_check_eligible_move_start)
-print(in_check_eligible_move_end)
+#in_check_moves()
+#print(in_check_eligible_move_start)
+#print(in_check_eligible_move_end)
 
 #move(49,42)
 #print(type(last_piece_taken))
@@ -495,4 +538,3 @@ print(in_check_eligible_move_end)
 #print(type(last_piece_taken))
 
 #print(eligble_moves())
-#play()
