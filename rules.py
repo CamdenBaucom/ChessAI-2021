@@ -146,10 +146,10 @@ def test_move(movestart,moveend):
 		last_movestart = movestart
 		global last_moveend
 		last_moveend = moveend
-		global old_movestart
-		old_movestart.append(movestart)
-		global old_moveend
-		old_moveend.append(moveend)
+		#global old_movestart
+		#old_movestart.append(movestart)
+		#global old_moveend
+		#old_moveend.append(moveend)
 		global iswhitemove
 		iswhitemove = not iswhitemove
 	else:
@@ -157,45 +157,64 @@ def test_move(movestart,moveend):
 
 def move(movestart,moveend):
 	if move_is_legal(movestart,moveend) == True:
-		if (in_check()) == False:
-			global last_piece_taken
-			last_piece_taken = board64[moveend]
-			board64[moveend] = board64[movestart]
-			board64[movestart] = '0'
-			print("Possible")
-			global last_movestart
-			last_movestart = movestart
-			global last_moveend
-			last_moveend = moveend
-			global old_movestart
-			old_movestart.append(movestart)
-			global old_moveend
-			old_moveend.append(moveend)
-			global iswhitemove
-			iswhitemove = not iswhitemove
-		else:
-			in_check_moves()
-			if ((movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end))):
-				#global last_piece_taken
+		if leads_to_check(movestart,moveend) == False:
+			if (in_check()) == False:
+				global last_piece_taken
 				last_piece_taken = board64[moveend]
 				board64[moveend] = board64[movestart]
 				board64[movestart] = '0'
 				print("Possible")
-				#global last_movestart
+				global last_movestart
 				last_movestart = movestart
-				#global last_moveend
+				global last_moveend
 				last_moveend = moveend
-				#global old_movestart
+				global old_movestart
 				old_movestart.append(movestart)
-				#global old_moveend
+				global old_moveend
 				old_moveend.append(moveend)
-				#global iswhitemove
+				global iswhitemove
 				iswhitemove = not iswhitemove
 			else:
-				print("Not possible")
+				in_check_moves()
+				if ((movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end))):
+					#global last_piece_taken
+					last_piece_taken = board64[moveend]
+					board64[moveend] = board64[movestart]
+					board64[movestart] = '0'
+					print("Possible")
+					#global last_movestart
+					last_movestart = movestart
+					#global last_moveend
+					last_moveend = moveend
+					#global old_movestart
+					old_movestart.append(movestart)
+					#global old_moveend
+					old_moveend.append(moveend)
+					#global iswhitemove
+					iswhitemove = not iswhitemove
+				else:
+					print("Not possible")
+		else:
+			print("Not possible")
 	else:
 		print("Not possible")
 
+def force_move(movestart,moveend):
+	global last_piece_taken
+	last_piece_taken = board64[moveend]
+	board64[moveend] = board64[movestart]
+	board64[movestart] = '0'
+	#print("Possible")
+	global last_movestart
+	last_movestart = movestart
+	global last_moveend
+	last_moveend = moveend
+	global old_movestart
+	old_movestart.append(movestart)
+	global old_moveend
+	old_moveend.append(moveend)
+	#global iswhitemove
+	#iswhitemove = not iswhitemove
 
 def unmove():
 	global last_movestart
@@ -304,6 +323,45 @@ def move_king_is_legal(movestart,moveend):
 			return True
 		else:
 			return False
+	elif abs(movestart-moveend) == 2:
+		move_king_sign2 = -abs(movestart-moveend) / (movestart-moveend)
+		move_king_sign2 = int(move_king_sign2)
+		if (board120[(move_convtr_64120(movestart))+(2*move_king_sign2)] == '0') and (hit_detec(movestart,moveend) == True):
+			global old_movestart
+			global old_moveend
+			if ((iswhitemove == True) and (60 not in old_movestart)):
+				if (((movestart-moveend) == 2) and (56 not in old_movestart) and (board120[move_convtr_64120(57)] == '0')) or (((movestart-moveend) == -2) and (63 not in old_movestart)):
+					return True
+				else:
+					return False
+			elif ((iswhitemove == False) and (4 not in old_movestart)):
+				if (((movestart-moveend) == 2) and (0 not in old_movestart) and (board120[move_convtr_64120(1)] == '0')) or (((movestart-moveend) == -2) and (7 not in old_movestart)):
+					return True
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
+
+def castling():
+	global old_movestart
+	global old_moveend
+	if len(old_moveend) > 0:
+		print("1")
+	if board120[move_convtr_64120(old_moveend[-1])] in ('k','K'):
+		print("2")
+	if (len(old_moveend) > 0) and (board120[move_convtr_64120(old_moveend[-1])] in ('k','K')):
+		if (old_movestart[-1] == 60) and (old_moveend[-1] == 62):
+			force_move(63,61)
+		elif (old_movestart[-1] == 60) and (old_moveend[-1] == 58):
+			force_move(56,59)
+		elif (old_movestart[-1] == 4) and (old_moveend[-1] == 6):
+			force_move(7,5)
+		elif (old_movestart[-1] == 4) and (old_moveend[-1] == 2):
+			force_move(0,3)
 
 def hit_detec(movestart,moveend):
 	hit_detec_sign = (moveend-movestart) / abs(moveend-movestart)
@@ -432,6 +490,22 @@ def in_check():
 		in_check = False
 		return in_check
 
+def leads_to_check(movestart,moveend):
+	test_move(movestart,moveend)
+	upd_board_64120()
+	global iswhitemove
+	iswhitemove = not iswhitemove
+	if (in_check()) == True:
+		iswhitemove = not iswhitemove
+		unmove()
+		upd_board_64120()
+		return True
+	else:
+		iswhitemove = not iswhitemove
+		unmove()
+		upd_board_64120()
+		return False
+
 def in_check_moves():
 	global in_check_eligible_move_start
 	global in_check_eligible_move_end
@@ -467,27 +541,6 @@ def in_check_moves():
 		#eligible_moves()
 		#print(eligible_move_start)
 
-'''
-		#show_board()
-		#eligible_moves()
-		iswhitemove = not iswhitemove
-		#both_eligible_moves()
-		#in_check()
-		#iswhitemove = not iswhitemove
-		#if in_check() == False:
-		#print(king_pos)
-		#print(eligible_move_end)
-		#if king_pos not in eligible_move_end:
-		if in_check() == False:
-			in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
-			in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
-		iswhitemove = not iswhitemove
-		print(opp_eligible_move_start)
-'''
-		#unmove()
-		#upd_board_64120
-		#show_board()
-
 def play():
 	while True:
 		both_eligible_moves()
@@ -503,6 +556,10 @@ def play():
 		x = board_notation_convtr(x)
 		y = board_notation_convtr(y)
 		move(x,y)
+		upd_board_64120()
+		castling()
+		#print(old_movestart)
+		#print(old_moveend)
 		upd_board_64120()
 #		both_eligible_moves()
 		#print("Are you in check?")
