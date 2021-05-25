@@ -330,8 +330,14 @@ def en_passant():
 
 def pawn_promotion():
 	global old_moveend
+	global pawn_promotion_unmove_state
+	global pawn_promotion_unmove_old_value
+	pawn_promotion_unmove_state = False
+	pawn_promotion_unmove_old_value = ''
 	new_piece_input_works = False
 	if (len(old_moveend) > 0) and (old_moveend[-1] in (0,1,2,3,4,5,6,7,56,57,58,59,60,61,62,63)) and (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')):
+		pawn_promotion_unmove_old_value = board120[move_convtr_64120(old_moveend[-1])]
+		pawn_promotion_unmove_state = True
 		while new_piece_input_works == False:
 			new_piece_input = input("Type what piece you want to promote your pawn to:\n")
 			if (old_moveend[-1] in (0,1,2,3,4,5,6,7)):
@@ -349,6 +355,22 @@ def pawn_promotion():
 					new_piece_input_works = True
 				else:
 					print("Please type a valid piece (Kings and Pawns are not allowed)")
+			else:
+				if new_piece_input in ("Knight","knight","N","n","Night","night","Nite","nite","Horse","horse"):
+					new_piece = "n"
+					new_piece_input_works = True
+				elif new_piece_input in ("Rook","rook","R","r","Rock","rock","Rok","rok","Castle","castle","Tower","tower"):
+					new_piece = "r"
+					new_piece_input_works = True
+				elif new_piece_input in ("Bishop","bishop","B","b","Priest","priest"):
+					new_piece = "b"
+					new_piece_input_works = True
+				elif new_piece_input in ("Queen","queen","Q","q"):
+					new_piece = "q"
+					new_piece_input_works = True
+				else:
+					print("Please type a valid piece (Kings and Pawns are not allowed)")
+		board64[old_moveend[-1]] = new_piece
 
 
 def move_rook_is_legal(movestart,moveend):
