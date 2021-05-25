@@ -530,7 +530,14 @@ def eligible_moves():
 			test_possible_move_end_knight_squares = [6,10,15,17,-6,-10,-15,-17]
 			while len(test_possible_move_end_knight_squares) > 0:
 				test_possible_move_end_knight = test_possible_move_end_knight_squares.pop(0)
-				test_possible_move_end.append(test_possible_move_start + test_possible_move_end_knight)
+				if (test_possible_move_start+test_possible_move_end_knight >= 0) and (test_possible_move_start + test_possible_move_end_knight <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_knight)
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('B','b'):
+			test_possible_move_end_bishop_squares = [7,14,21,28,35,42,49,9,18,27,36,45,54,63,-7,-14,-21,-28,-35,-42,-49,-9,-18,-27,-36,-45,-54,-63]
+			while len(test_possible_move_end_bishop_squares) > 0:
+				test_possible_move_end_bishop = test_possible_move_end_bishop_squares.pop(0)
+				if (test_possible_move_start+test_possible_move_end_bishop >= 0) and (test_possible_move_start + test_possible_move_end_bishop <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_bishop)
 
 		for x in range(64):
 			if x != test_possible_move_start:
