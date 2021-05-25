@@ -80,7 +80,6 @@ def horiz_range(movestart):
 
 def board_notation_convtr(movestart):
 	board_notation_char = [char for char in movestart]
- 	#board_notation_counter = 0
 	if 'a' in board_notation_char or 'A' in board_notation_char:
 		board_notation_counter = 7
 	elif 'b' in board_notation_char or 'B' in board_notation_char:
@@ -120,9 +119,6 @@ def board_notation_convtr(movestart):
 	board_notation_counter = 63-board_notation_counter
 	return board_notation_counter
 
-
-	#return board_notation_char
-
 def can_take(movestart):
 	if board120[(move_convtr_64120(movestart))].islower() == True:
 		return ['P','R','N','B','Q','K','0']
@@ -141,15 +137,10 @@ def test_move(movestart,moveend):
 		last_piece_taken = board64[moveend]
 		board64[moveend] = board64[movestart]
 		board64[movestart] = '0'
-		#print("Possible")
 		global last_movestart
 		last_movestart = movestart
 		global last_moveend
 		last_moveend = moveend
-		#global old_movestart
-		#old_movestart.append(movestart)
-		#global old_moveend
-		#old_moveend.append(moveend)
 		global iswhitemove
 		iswhitemove = not iswhitemove
 	else:
@@ -204,7 +195,6 @@ def force_move(movestart,moveend):
 	last_piece_taken = board64[moveend]
 	board64[moveend] = board64[movestart]
 	board64[movestart] = '0'
-	#print("Possible")
 	global last_movestart
 	last_movestart = movestart
 	global last_moveend
@@ -213,8 +203,6 @@ def force_move(movestart,moveend):
 	old_movestart.append(movestart)
 	global old_moveend
 	old_moveend.append(moveend)
-	#global iswhitemove
-	#iswhitemove = not iswhitemove
 
 def unmove():
 	global last_movestart
@@ -262,25 +250,20 @@ def move_pawn_is_legal(movestart,moveend):
 		pawn_move_direction = 1
 	if movestart == moveend + (8*pawn_move_direction):
 		if board120[(move_convtr_64120(moveend))] == '0':
-			#print("1")
 			return True
 		else:
 			return False
 	elif (movestart == moveend + (16*pawn_move_direction)) and (((pawn_move_direction == -1) and (movestart in (8,9,10,11,12,13,14,15))) or ((pawn_move_direction == 1) and (movestart in (48,49,50,51,52,53,54,55)))):
 		if (hit_detec(movestart,moveend) == True) and (board120[move_convtr_64120(moveend)] == '0'):
-			#print("2")
 			return True
 		else:
 			return False
 	elif (movestart == (moveend + 7*pawn_move_direction) or movestart == (moveend + 9*pawn_move_direction)) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)) and board120[(move_convtr_64120(moveend))] != '0':
 		if movestart not in (8,16,24,32,40,48,15,23,31,39,47,55):
-			#print("3")
 			return True
 		elif movestart == moveend + 7*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (15,23,31,39,47,55)) or (pawn_move_direction == 1 and movestart in (8,16,24,32,40,48))):
-			#print("4")
 			return True
 		elif movestart == moveend + 9*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (8,16,24,32,40,48)) or (pawn_move_direction == 1 and movestart in (15,23,31,39,47,55))):
-			#print("5")
 			return True
 		else:
 			return False
@@ -446,10 +429,6 @@ def castling():
 	global old_moveend
 	global castling_unmove_state
 	castling_unmove_state = False
-	#if len(old_moveend) > 0:
-		#print("1")
-	#if board120[move_convtr_64120(old_moveend[-1])] in ('k','K'):
-		#print("2")
 	if (len(old_moveend) > 0) and (board120[move_convtr_64120(old_moveend[-1])] in ('k','K')):
 		castling_unmove_state = True
 		if (old_movestart[-1] == 60) and (old_moveend[-1] == 62):
@@ -541,10 +520,6 @@ def eligible_moves():
 				if (move_is_legal(test_possible_move_start,x)) == True:
 					eligible_move_start.append(test_possible_move_start)
 					eligible_move_end.append(x)
-	#global eligble_move_start
-	#global eligble_move_end
-	#return eligble_move_start
-	#return possible_move_start
 
 def both_eligible_moves():
 	global iswhitemove
@@ -613,41 +588,23 @@ def in_check_moves():
 	both_eligible_moves()
 	in_check_possible_eligible_move_start = eligible_move_start
 	in_check_possible_eligible_move_end = eligible_move_end
-#	print(len(in_check_possible_eligible_move_end))
 	while len(in_check_possible_eligible_move_start) > 0:
 		test_in_check_possible_eligible_move_start = in_check_possible_eligible_move_start.pop(0)
 		test_in_check_possible_eligible_move_end = in_check_possible_eligible_move_end.pop(0)
-		#print(test_in_check_possible_eligible_move_start)
-		#print(test_in_check_possible_eligible_move_end)
 		test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)
 		upd_board_64120()
-
-#		if iswhitemove == False:
-#			for i in range(64)
-
 		iswhitemove = not iswhitemove
-		#in_check()
 		if (in_check()) == False:
 			in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
 			in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
 		iswhitemove = not iswhitemove
 		eligible_moves()
-#		print(eligible_move_end)
-		#iswhitemove = not iswhitemove
 		unmove()
 		upd_board_64120()
-		#eligible_moves()
-		#print(eligible_move_start)
 
 def play():
 	while True:
 		both_eligible_moves()
-#		print(eligible_move_start)
-#		print(eligible_move_end)
-#		print("\n")
-		#print(opp_eligible_move_start)
-		#print(opp_eligible_move_end)
-#		print(in_check())
 		show_board()
 		x = input('Starting move:\n')
 		y = input('Ending move:\n')
@@ -658,40 +615,8 @@ def play():
 		castling()
 		en_passant()
 		pawn_promotion()
-		#print(old_movestart)
-		#print(old_moveend)
 		upd_board_64120()
-#		both_eligible_moves()
-		#print("Are you in check?")
-		#print(in_check())
-		#print(king_pos)
-		#upd_board_64120()
-		#eligible_moves()
-
+		
 
 upd_board_12064()
 play()
-#opp_eligible_moves()
-#print(in_check())
-#in_check_moves()
-
-#eligible_moves()
-#print(eligible_move_start)
-#print(eligible_move_end)
-
-#in_check_moves()
-#print(in_check_eligible_move_start)
-#print(in_check_eligible_move_end)
-
-#move(49,42)
-#print(type(last_piece_taken))
-#upd_board_64120()
-#show_board()
-#unmove()
-#upd_board_64120()
-#show_board()
-#print(board120[move_convtr_64120(42)])
-#move(49,41)
-#print(type(last_piece_taken))
-
-#print(eligble_moves())
