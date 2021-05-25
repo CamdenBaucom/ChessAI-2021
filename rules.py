@@ -222,6 +222,16 @@ def unmove():
 	global last_piece_taken
 	board64[last_movestart] = board64[last_moveend]
 	board64[last_moveend] = last_piece_taken
+	global castling_unmove_state
+	if (len(old_movestart) > 2) and (castling_unmove_state == True):
+		board64[old_movestart[-2]] = board64[old_moveend[-2]]
+		board64[old_moveend[-2]] = '0'
+	global en_passant_unmove_state
+	if (len(old_movestart) > 1) and (en_passant_unmove_state == True):
+		if last_piece_taken == 'p':
+			force_move(last_moveend,(last_moveend+8))
+		else:
+			force_move(last_moveend,(last_moveend-8))
 	global iswhitemove
 	iswhitemove = not iswhitemove
 
@@ -274,8 +284,42 @@ def move_pawn_is_legal(movestart,moveend):
 			return True
 		else:
 			return False
+	elif (len(old_movestart) > 0) and (((old_movestart[-1])-(old_moveend[-1])) == (-16*pawn_move_direction)):
+		if (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')) and (((old_moveend[-1]) - (8*pawn_move_direction)) == (moveend)):
+			if ((board120[(move_convtr_64120(movestart)) + 1]) == (board120[move_convtr_64120(old_moveend[-1])])):
+				if (pawn_move_direction == -1) and ((movestart-moveend) == (9*pawn_move_direction)):
+					return True
+				elif (pawn_move_direction == 1) and ((movestart-moveend) == (7*pawn_move_direction)):
+					return True
+				else:
+					return False
+			elif ((board120[(move_convtr_64120(movestart)) - 1]) == (board120[move_convtr_64120(old_moveend[-1])])):
+				if (pawn_move_direction == -1) and ((movestart-moveend) == (7*pawn_move_direction)):
+					return True
+				elif (pawn_move_direction == 1) and ((movestart-moveend) == (9*pawn_move_direction)):
+					return True
+				else:
+					return False
+			else:
+				return False
 	else:
 		return False
+
+def en_passant():
+	global last_piece_taken
+	global old_movestart
+	global old_moveend
+	global en_passant_unmove_state
+	en_passant_unmove_state = False
+	if (len(old_movestart) > 0) and (last_piece_taken == '0') and (abs(old_movestart[-1]-old_moveend[-1]) in (7,9)) and (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')):
+		if board120[move_convtr_64120(old_moveend[-1])] == 'p':
+			last_piece_taken = 'P'
+			board64[last_moveend - 8] = '0'
+			en_passant_unmove_state = True
+		else:
+			last_piece_taken = 'p'
+			board64[last_moveend + 8] = '0'
+			en_passant_unmove_state = True
 
 
 def move_rook_is_legal(movestart,moveend):
@@ -349,11 +393,14 @@ def move_king_is_legal(movestart,moveend):
 def castling():
 	global old_movestart
 	global old_moveend
-	if len(old_moveend) > 0:
-		print("1")
-	if board120[move_convtr_64120(old_moveend[-1])] in ('k','K'):
-		print("2")
+	global castling_unmove_state
+	castling_unmove_state = False
+	#if len(old_moveend) > 0:
+		#print("1")
+	#if board120[move_convtr_64120(old_moveend[-1])] in ('k','K'):
+		#print("2")
 	if (len(old_moveend) > 0) and (board120[move_convtr_64120(old_moveend[-1])] in ('k','K')):
+		castling_unmove_state = True
 		if (old_movestart[-1] == 60) and (old_moveend[-1] == 62):
 			force_move(63,61)
 		elif (old_movestart[-1] == 60) and (old_moveend[-1] == 58):
@@ -558,6 +605,7 @@ def play():
 		move(x,y)
 		upd_board_64120()
 		castling()
+		en_passant()
 		#print(old_movestart)
 		#print(old_moveend)
 		upd_board_64120()
