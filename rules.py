@@ -524,7 +524,13 @@ def eligible_moves():
 			test_possible_move_end_rook_squares = [1,2,3,4,5,6,7,-1,-2,-3,-4,-5,-6,-7,8,16,24,32,40,48,56,-8,-16,-24,-32,-40,-48,-56]
 			while len(test_possible_move_end_rook_squares) > 0:
 				test_possible_move_end_rook = test_possible_move_end_rook_squares.pop(0)
-				test_possible_move_end.append(test_possible_move_start + test_possible_move_end_rook)
+				if (test_possible_move_start+test_possible_move_end_rook >= 0) and (test_possible_move_start + test_possible_move_end_rook <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_rook)
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('N','n'):
+			test_possible_move_end_knight_squares = [6,10,15,17,-6,-10,-15,-17]
+			while len(test_possible_move_end_knight_squares) > 0:
+				test_possible_move_end_knight = test_possible_move_end_knight_squares.pop(0)
+				test_possible_move_end.append(test_possible_move_start + test_possible_move_end_knight)
 
 		for x in range(64):
 			if x != test_possible_move_start:
