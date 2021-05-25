@@ -505,6 +505,7 @@ def eligible_moves():
 	possible_move_start = []
 	test_possible_move_start = []
 	possible_move_start = []
+	test_possible_move_end = []
 	if iswhitemove == True:
 		for i in range(64):
 			if board120[(move_convtr_64120(i))] in ('P','R','N','B','Q','K'):
@@ -515,6 +516,10 @@ def eligible_moves():
 				possible_move_start.append(i)
 	while len(possible_move_start) > 0:
 		test_possible_move_start = possible_move_start.pop(0)
+		if board120[move_convtr_64120(test_possible_move_start] in ('p'):
+			test_possible_move_end.extend((test_possible_move_start + 8, test_possible_move_start + 16, test_possible_move_start + 7, test_possible_move_start + 9))
+
+
 		for x in range(64):
 			if x != test_possible_move_start:
 				if (move_is_legal(test_possible_move_start,x)) == True:
