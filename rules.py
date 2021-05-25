@@ -147,24 +147,30 @@ def test_move(movestart,moveend):
 		print("Not possible")
 
 def move(movestart,moveend):
-	if move_is_legal(movestart,moveend) == True:
-		if leads_to_check(movestart,moveend) == False:
-			if (in_check()) == False:
-				global last_piece_taken
-				last_piece_taken = board64[moveend]
-				board64[moveend] = board64[movestart]
-				board64[movestart] = '0'
-				print("Possible")
-				global last_movestart
-				last_movestart = movestart
-				global last_moveend
-				last_moveend = moveend
-				global old_movestart
-				old_movestart.append(movestart)
-				global old_moveend
-				old_moveend.append(moveend)
-				global iswhitemove
-				iswhitemove = not iswhitemove
+#	if move_is_legal(movestart,moveend) == True:
+#		if leads_to_check(movestart,moveend) == False:
+#			if (in_check()) == False:
+	in_check_moves()
+	if (movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end)):
+		global last_piece_taken
+		last_piece_taken = board64[moveend]
+		board64[moveend] = board64[movestart]
+		board64[movestart] = '0'
+		print("Possible")
+		global last_movestart
+		last_movestart = movestart
+		global last_moveend
+		last_moveend = moveend
+		global old_movestart
+		old_movestart.append(movestart)
+		global old_moveend
+		old_moveend.append(moveend)
+		global iswhitemove
+		iswhitemove = not iswhitemove
+	else:
+		print("Not possible")
+
+'''
 			else:
 				in_check_moves()
 				if ((movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end))):
@@ -187,8 +193,9 @@ def move(movestart,moveend):
 					print("Not possible")
 		else:
 			print("Not possible")
-	else:
-		print("Not possible")
+'''
+	#else:
+		#print("Not possible")
 
 def force_move(movestart,moveend):
 	global last_piece_taken
@@ -538,12 +545,23 @@ def eligible_moves():
 				test_possible_move_end_bishop = test_possible_move_end_bishop_squares.pop(0)
 				if (test_possible_move_start+test_possible_move_end_bishop >= 0) and (test_possible_move_start + test_possible_move_end_bishop <= 63):
 					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_bishop)
-
-		for x in range(64):
-			if x != test_possible_move_start:
-				if (move_is_legal(test_possible_move_start,x)) == True:
-					eligible_move_start.append(test_possible_move_start)
-					eligible_move_end.append(x)
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('Q','q'):
+			test_possible_move_end_queen_squares = [1,2,3,4,5,6,-1,-2,-3,-4,-5,-6,8,16,24,32,40,48,56,-8,-16,-24,-32,-40,-48,-56,7,14,21,28,35,42,49,9,18,27,36,45,54,63,-7,-14,-21,-28,-35,-42,-49,-9,-18,-27,-36,-45,-54,-63]
+			while len(test_possible_move_end_queen_squares) > 0:
+				test_possible_move_end_queen = test_possible_move_end_queen_squares.pop(0)
+				if (test_possible_move_start+test_possible_move_end_queen >= 0) and (test_possible_move_start + test_possible_move_end_queen <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_queen)
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('K','k'):
+			test_possible_move_end_king_squares = [1,2,7,8,9,-1,-2,-7,-8,-9]
+			while len(test_possible_move_end_king_squares) > 0:
+				test_possible_move_end_king = test_possible_move_end_king_squares.pop(0)
+				if (test_possible_move_start+test_possible_move_end_king >= 0) and (test_possible_move_start + test_possible_move_end_king <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_king)
+		while len(test_possible_move_end) > 0:
+			possible_move_end = test_possible_move_end.pop(0)
+			if (move_is_legal(test_possible_move_start,possible_move_end)) == True:
+				eligible_move_start.append(test_possible_move_start)
+				eligible_move_end.append(possible_move_end)
 
 def both_eligible_moves():
 	global iswhitemove
@@ -630,6 +648,9 @@ def play():
 	while True:
 		both_eligible_moves()
 		show_board()
+		#in_check_moves()
+		#print(in_check_eligible_move_start)
+		#print(in_check_eligible_move_end)
 		x = input('Starting move:\n')
 		y = input('Ending move:\n')
 		x = board_notation_convtr(x)
@@ -640,7 +661,7 @@ def play():
 		en_passant()
 		pawn_promotion()
 		upd_board_64120()
-		
+
 
 upd_board_12064()
 play()
