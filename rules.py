@@ -291,6 +291,13 @@ def move_pawn_is_legal(movestart,moveend):
 					return True
 				elif (pawn_move_direction == 1) and ((movestart-moveend) == (7*pawn_move_direction)):
 					return True
+				elif ((board120[(move_convtr_64120(movestart)) - 1]) == (board120[move_convtr_64120(old_moveend[-1])])):
+					if (pawn_move_direction == -1) and ((movestart-moveend) == (7*pawn_move_direction)):
+						return True
+					elif (pawn_move_direction == 1) and ((movestart-moveend) == (9*pawn_move_direction)):
+						return True
+					else:
+						return False
 				else:
 					return False
 			elif ((board120[(move_convtr_64120(movestart)) - 1]) == (board120[move_convtr_64120(old_moveend[-1])])):
@@ -320,6 +327,28 @@ def en_passant():
 			last_piece_taken = 'p'
 			board64[last_moveend + 8] = '0'
 			en_passant_unmove_state = True
+
+def pawn_promotion():
+	global old_moveend
+	new_piece_input_works = False
+	if (len(old_moveend) > 0) and (old_moveend[-1] in (0,1,2,3,4,5,6,7,56,57,58,59,60,61,62,63)) and (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')):
+		while new_piece_input_works == False:
+			new_piece_input = input("Type what piece you want to promote your pawn to:\n")
+			if (old_moveend[-1] in (0,1,2,3,4,5,6,7)):
+				if new_piece_input in ("Knight","knight","N","n","Night","night","Nite","nite","Horse","horse"):
+					new_piece = "N"
+					new_piece_input_works = True
+				elif new_piece_input in ("Rook","rook","R","r","Rock","rock","Rok","rok","Castle","castle","Tower","tower"):
+					new_piece = "R"
+					new_piece_input_works = True
+				elif new_piece_input in ("Bishop","bishop","B","b","Priest","priest"):
+					new_piece = "B"
+					new_piece_input_works = True
+				elif new_piece_input in ("Queen","queen","Q","q"):
+					new_piece = "Q"
+					new_piece_input_works = True
+				else:
+					print("Please type a valid piece (Kings and Pawns are not allowed)")
 
 
 def move_rook_is_legal(movestart,moveend):
@@ -606,6 +635,7 @@ def play():
 		upd_board_64120()
 		castling()
 		en_passant()
+		pawn_promotion()
 		#print(old_movestart)
 		#print(old_moveend)
 		upd_board_64120()
