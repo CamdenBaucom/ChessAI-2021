@@ -644,13 +644,32 @@ def in_check_moves():
 		unmove()
 		upd_board_64120()
 
+def end_conditions():
+	in_check_moves()
+	global old_movestart
+	global old_moveend
+	if len(in_check_eligible_move_start) == 0:
+		if (in_check()) == True:
+			if iswhitemove == True:
+				print("Black Wins!")
+				return False
+			else:
+				print("White Wins!")
+				return False
+		else:
+			print("Draw by Stalemate")
+			return False
+	if len(old_movestart) >= 8:
+		if ((old_movestart[-8],old_moveend[-8]) == (old_moveend[-6],old_movestart[-6]) == (old_movestart[-4],old_moveend[-4]) == (old_moveend[-2],old_movestart[-2])) and
+
+
 def play():
 	while True:
 		both_eligible_moves()
 		show_board()
-		#in_check_moves()
-		#print(in_check_eligible_move_start)
-		#print(in_check_eligible_move_end)
+		in_check_moves()
+		print(in_check_eligible_move_start)
+		print(in_check_eligible_move_end)
 		x = input('Starting move:\n')
 		y = input('Ending move:\n')
 		x = board_notation_convtr(x)
