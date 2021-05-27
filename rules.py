@@ -1,13 +1,13 @@
 board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
-'-1','r','n','b','q','k','b','n','r','-1',
-'-1','p','p','p','p','p','p','p','p','-1',
+'-1','0','0','0','q','k','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
-'-1','P','P','P','P','P','P','P','P','-1',
-'-1','R','N','B','Q','K','B','N','R','-1',
+'-1','0','0','0','0','0','0','0','0','-1',
+'-1','0','0','0','0','0','0','0','0','-1',
+'-1','0','0','0','0','K','0','0','0','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1']
 
@@ -143,14 +143,16 @@ def test_move(movestart,moveend):
 		last_moveend = moveend
 		global iswhitemove
 		iswhitemove = not iswhitemove
+		return True
 	else:
 		print("Not possible")
+		return False
 
 def move(movestart,moveend):
 #	if move_is_legal(movestart,moveend) == True:
 #		if leads_to_check(movestart,moveend) == False:
 #			if (in_check()) == False:
-	in_check_moves()
+	#in_check_moves()
 	if (movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end)):
 		global last_piece_taken
 		last_piece_taken = board64[moveend]
@@ -606,20 +608,23 @@ def in_check():
 		return in_check
 
 def leads_to_check(movestart,moveend):
-	test_move(movestart,moveend)
-	upd_board_64120()
-	global iswhitemove
-	iswhitemove = not iswhitemove
-	if (in_check()) == True:
-		iswhitemove = not iswhitemove
-		unmove()
+	if (test_move(movestart,moveend)) == True:
 		upd_board_64120()
-		return True
+		global iswhitemove
+		iswhitemove = not iswhitemove
+		if (in_check()) == True:
+			iswhitemove = not iswhitemove
+			unmove()
+			upd_board_64120()
+			return True
+		else:
+			iswhitemove = not iswhitemove
+			unmove()
+			upd_board_64120()
+			return False
 	else:
 		iswhitemove = not iswhitemove
-		unmove()
-		upd_board_64120()
-		return False
+		#print("Not an eligible move")
 
 def in_check_moves():
 	global in_check_eligible_move_start
@@ -633,16 +638,18 @@ def in_check_moves():
 	while len(in_check_possible_eligible_move_start) > 0:
 		test_in_check_possible_eligible_move_start = in_check_possible_eligible_move_start.pop(0)
 		test_in_check_possible_eligible_move_end = in_check_possible_eligible_move_end.pop(0)
-		test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)
-		upd_board_64120()
-		iswhitemove = not iswhitemove
-		if (in_check()) == False:
-			in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
-			in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
-		iswhitemove = not iswhitemove
-		eligible_moves()
-		unmove()
-		upd_board_64120()
+		if (test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)) == True:
+			upd_board_64120()
+			iswhitemove = not iswhitemove
+			if (in_check()) == False:
+				in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
+				in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
+			iswhitemove = not iswhitemove
+			eligible_moves()
+			unmove()
+			upd_board_64120()
+		else:
+			iswhitemove = not iswhitemove
 
 def end_conditions():
 	in_check_moves()
@@ -659,15 +666,18 @@ def end_conditions():
 		else:
 			print("Draw by Stalemate")
 			return False
-	if len(old_movestart) >= 8:
-		if ((old_movestart[-8],old_moveend[-8]) == (old_moveend[-6],old_movestart[-6]) == (old_movestart[-4],old_moveend[-4]) == (old_moveend[-2],old_movestart[-2])) and
-
+	elif len(old_movestart) >= 8:
+		if ((old_movestart[-8],old_moveend[-8]) == (old_moveend[-6],old_movestart[-6]) == (old_movestart[-4],old_moveend[-4]) == (old_moveend[-2],old_movestart[-2])) and ((old_movestart[-8],old_moveend[-8]) == (old_moveend[-6],old_movestart[-6]) == (old_movestart[-4],old_moveend[-4]) == (old_moveend[-2],old_movestart[-2])):
+			print("Draw by Repetion")
+			return False
+	else:
+		return True
 
 def play():
-	while True:
-		both_eligible_moves()
+	while end_conditions():
+		#both_eligible_moves()
 		show_board()
-		in_check_moves()
+		#in_check_moves()
 		print(in_check_eligible_move_start)
 		print(in_check_eligible_move_end)
 		x = input('Starting move:\n')
