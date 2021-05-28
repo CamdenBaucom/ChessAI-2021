@@ -1,13 +1,13 @@
 board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
-'-1','0','0','0','q','k','0','0','0','-1',
+'-1','r','n','b','q','k','b','n','r','-1',
+'-1','p','p','p','p','p','p','p','p','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
 '-1','0','0','0','0','0','0','0','0','-1',
-'-1','0','0','0','0','0','0','0','0','-1',
-'-1','0','0','0','0','0','0','0','0','-1',
-'-1','0','0','0','0','K','0','0','0','-1',
+'-1','P','P','P','P','P','P','P','P','-1',
+'-1','R','N','B','Q','K','B','N','R','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
 '-1','-1','-1','-1','-1','-1','-1','-1','-1','-1']
 
@@ -417,12 +417,12 @@ def move_king_is_legal(movestart,moveend):
 			global old_movestart
 			global old_moveend
 			if ((iswhitemove == True) and (60 not in old_movestart)):
-				if (((movestart-moveend) == 2) and (56 not in old_movestart) and (board120[move_convtr_64120(57)] == '0')) or (((movestart-moveend) == -2) and (63 not in old_movestart)):
+				if (((movestart-moveend) == 2) and (56 not in old_movestart) and (board120[move_convtr_64120(56)] == 'R') and (castling_not_through_check(60,63) == True)) or (((movestart-moveend) == -2) and (63 not in old_movestart) and (board120[move_convtr_64120(63)] == 'R') and (castling_not_through_check(60,56) == True)):
 					return True
 				else:
 					return False
 			elif ((iswhitemove == False) and (4 not in old_movestart)):
-				if (((movestart-moveend) == 2) and (0 not in old_movestart) and (board120[move_convtr_64120(1)] == '0')) or (((movestart-moveend) == -2) and (7 not in old_movestart)):
+				if (((movestart-moveend) == 2) and (0 not in old_movestart) and (board120[move_convtr_64120(0)] == 'r') and (castling_not_through_check(4,0) == True)) or (((movestart-moveend) == -2) and (7 not in old_movestart) and (board120[move_convtr_64120(7)] == 'r') and (castling_not_through_check(4,7) == True)):
 					return True
 				else:
 					return False
@@ -432,6 +432,19 @@ def move_king_is_legal(movestart,moveend):
 			return False
 	else:
 		return False
+
+def castling_not_through_check(movestart,moveend):
+	castling_movement_direc = (movestart-moveend) / abs(movestart-moveend)
+	for i in range(abs(movestart-moveend)):
+		castling_movement_check_moveend = (movestart-((i+1)*(castling_movement_direc)))
+		castling_movement_check_moveend = int(castling_movement_check_moveend)
+		force_move(movestart,castling_movement_check_moveend)
+		upd_board_64120()
+		if (in_check()) == True:
+			return False
+		unmove()
+		upd_board_64120()
+	return True
 
 def castling():
 	global old_movestart
@@ -674,7 +687,7 @@ def end_conditions():
 		return True
 
 def play():
-	while end_conditions():
+	while (end_conditions() == True):
 		#both_eligible_moves()
 		show_board()
 		#in_check_moves()
