@@ -172,33 +172,6 @@ def move(movestart,moveend):
 	else:
 		print("Not possible")
 
-'''
-			else:
-				in_check_moves()
-				if ((movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end))):
-					#global last_piece_taken
-					last_piece_taken = board64[moveend]
-					board64[moveend] = board64[movestart]
-					board64[movestart] = '0'
-					print("Possible")
-					#global last_movestart
-					last_movestart = movestart
-					#global last_moveend
-					last_moveend = moveend
-					#global old_movestart
-					old_movestart.append(movestart)
-					#global old_moveend
-					old_moveend.append(moveend)
-					#global iswhitemove
-					iswhitemove = not iswhitemove
-				else:
-					print("Not possible")
-		else:
-			print("Not possible")
-'''
-	#else:
-		#print("Not possible")
-
 def force_move(movestart,moveend):
 	global last_piece_taken
 	last_piece_taken = board64[moveend]
@@ -212,6 +185,16 @@ def force_move(movestart,moveend):
 	old_movestart.append(movestart)
 	global old_moveend
 	old_moveend.append(moveend)
+
+def force_test_move(movestart,moveend):
+	global last_piece_taken
+	last_piece_taken = board64[moveend]
+	board64[moveend] = board64[movestart]
+	board64[movestart] = '0'
+	global last_movestart
+	last_movestart = movestart
+	global last_moveend
+	last_moveend = moveend
 
 def unmove():
 	global last_movestart
@@ -417,12 +400,12 @@ def move_king_is_legal(movestart,moveend):
 			global old_movestart
 			global old_moveend
 			if ((iswhitemove == True) and (60 not in old_movestart)):
-				if (((movestart-moveend) == 2) and (56 not in old_movestart) and (board120[move_convtr_64120(56)] == 'R') and (castling_not_through_check(60,63) == True)) or (((movestart-moveend) == -2) and (63 not in old_movestart) and (board120[move_convtr_64120(63)] == 'R') and (castling_not_through_check(60,56) == True)):
+				if (((movestart-moveend) == 2) and (56 not in old_movestart) and (board120[move_convtr_64120(56)] == 'R')) or (((movestart-moveend) == -2) and (63 not in old_movestart) and (board120[move_convtr_64120(63)] == 'R')):
 					return True
 				else:
 					return False
 			elif ((iswhitemove == False) and (4 not in old_movestart)):
-				if (((movestart-moveend) == 2) and (0 not in old_movestart) and (board120[move_convtr_64120(0)] == 'r') and (castling_not_through_check(4,0) == True)) or (((movestart-moveend) == -2) and (7 not in old_movestart) and (board120[move_convtr_64120(7)] == 'r') and (castling_not_through_check(4,7) == True)):
+				if (((movestart-moveend) == 2) and (0 not in old_movestart) and (board120[move_convtr_64120(0)] == 'r')) or (((movestart-moveend) == -2) and (7 not in old_movestart) and (board120[move_convtr_64120(7)] == 'r')):
 					return True
 				else:
 					return False
@@ -434,17 +417,15 @@ def move_king_is_legal(movestart,moveend):
 		return False
 
 def castling_not_through_check(movestart,moveend):
+	#global iswhitemove
 	castling_movement_direc = (movestart-moveend) / abs(movestart-moveend)
-	for i in range(abs(movestart-moveend)):
-		castling_movement_check_moveend = (movestart-((i+1)*(castling_movement_direc)))
-		castling_movement_check_moveend = int(castling_movement_check_moveend)
-		force_move(movestart,castling_movement_check_moveend)
-		upd_board_64120()
-		if (in_check()) == True:
-			return False
-		unmove()
-		upd_board_64120()
-	return True
+	opp_eligible_moves()
+	castling_inbetween_move = movestart-(1*castling_movement_direc)
+	castling_inbetween_move = int(castling_inbetween_move)
+	if castling_inbetween_move in (opp_eligible_move_end):
+		return False
+	else:
+		return True
 
 def castling():
 	global old_movestart
@@ -651,7 +632,21 @@ def in_check_moves():
 	while len(in_check_possible_eligible_move_start) > 0:
 		test_in_check_possible_eligible_move_start = in_check_possible_eligible_move_start.pop(0)
 		test_in_check_possible_eligible_move_end = in_check_possible_eligible_move_end.pop(0)
-		if (test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)) == True:
+		if (abs(test_in_check_possible_eligible_move_start-test_in_check_possible_eligible_move_end) == 2) and (board120[move_convtr_64120(test_in_check_possible_eligible_move_start)] in ('K','k')):
+			if ((in_check()) == False) and (castling_not_through_check(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end) == True):
+				if (test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)) == True:
+					upd_board_64120()
+					iswhitemove = not iswhitemove
+					if (in_check()) == False:
+						in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
+						in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
+					iswhitemove = not iswhitemove
+					eligible_moves()
+					unmove()
+					upd_board_64120()
+				else:
+					iswhitemove = not iswhitemove
+		elif (test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)) == True:
 			upd_board_64120()
 			iswhitemove = not iswhitemove
 			if (in_check()) == False:
