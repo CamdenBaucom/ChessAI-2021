@@ -186,15 +186,15 @@ def force_move(movestart,moveend):
 	global old_moveend
 	old_moveend.append(moveend)
 
-def force_test_move(movestart,moveend):
-	global last_piece_taken
-	last_piece_taken = board64[moveend]
-	board64[moveend] = board64[movestart]
-	board64[movestart] = '0'
-	global last_movestart
-	last_movestart = movestart
-	global last_moveend
-	last_moveend = moveend
+#def force_test_move(movestart,moveend):
+#	global last_piece_taken
+#	last_piece_taken = board64[moveend]
+#	board64[moveend] = board64[movestart]
+#	board64[movestart] = '0'
+#	global last_movestart
+#	last_movestart = movestart
+#	global last_moveend
+#	last_moveend = moveend
 
 def unmove():
 	global last_movestart
@@ -203,9 +203,9 @@ def unmove():
 	board64[last_movestart] = board64[last_moveend]
 	board64[last_moveend] = last_piece_taken
 	global castling_unmove_state
-	if (len(old_movestart) > 2) and (castling_unmove_state == True):
-		board64[old_movestart[-2]] = board64[old_moveend[-2]]
-		board64[old_moveend[-2]] = '0'
+#	if (len(old_movestart) > 2) and (castling_unmove_state == True):
+#		board64[old_movestart[-1]] = board64[old_moveend[-1]]
+#		board64[old_moveend[-1]] = last_piece_taken
 	global en_passant_unmove_state
 	if (len(old_movestart) > 1) and (en_passant_unmove_state == True):
 		if last_piece_taken == 'p':
@@ -432,7 +432,7 @@ def castling():
 	global old_moveend
 	global castling_unmove_state
 	castling_unmove_state = False
-	if (len(old_moveend) > 0) and (board120[move_convtr_64120(old_moveend[-1])] in ('k','K')):
+	if (len(old_moveend) > 0) and (board120[move_convtr_64120(old_moveend[-1])] in ('k','K')) and (abs((old_moveend[-1])-(old_movestart[-1])) == 2):
 		castling_unmove_state = True
 		if (old_movestart[-1] == 60) and (old_moveend[-1] == 62):
 			force_move(63,61)
@@ -675,9 +675,11 @@ def end_conditions():
 			print("Draw by Stalemate")
 			return False
 	elif len(old_movestart) >= 8:
-		if ((old_movestart[-8],old_moveend[-8]) == (old_moveend[-6],old_movestart[-6]) == (old_movestart[-4],old_moveend[-4]) == (old_moveend[-2],old_movestart[-2])) and ((old_movestart[-8],old_moveend[-8]) == (old_moveend[-6],old_movestart[-6]) == (old_movestart[-4],old_moveend[-4]) == (old_moveend[-2],old_movestart[-2])):
+		if ((old_movestart[-8],old_moveend[-8]) == (old_moveend[-6],old_movestart[-6]) == (old_movestart[-4],old_moveend[-4]) == (old_moveend[-2],old_movestart[-2])) and ((old_movestart[-7],old_moveend[-7]) == (old_moveend[-5],old_movestart[-5]) == (old_movestart[-3],old_moveend[-3]) == (old_moveend[-1],old_movestart[-1])):
 			print("Draw by Repetion")
 			return False
+		else:
+			return True
 	else:
 		return True
 
@@ -686,6 +688,10 @@ def play():
 		#both_eligible_moves()
 		show_board()
 		#in_check_moves()
+		if iswhitemove == True:
+			print("White's Move")
+		else:
+			print("Black's Move")
 		print(in_check_eligible_move_start)
 		print(in_check_eligible_move_end)
 		x = input('Starting move:\n')
