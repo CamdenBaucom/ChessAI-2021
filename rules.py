@@ -207,11 +207,11 @@ def unmove():
 #		board64[old_movestart[-1]] = board64[old_moveend[-1]]
 #		board64[old_moveend[-1]] = last_piece_taken
 	global en_passant_unmove_state
-	if (len(old_movestart) > 1) and (en_passant_unmove_state == True):
-		if last_piece_taken == 'p':
-			force_move(last_moveend,(last_moveend+8))
-		else:
-			force_move(last_moveend,(last_moveend-8))
+#	if (len(old_movestart) > 1) and (en_passant_unmove_state == True):
+#		if last_piece_taken == 'p':
+#			force_move(last_moveend,(last_moveend+8))
+#		else:
+#			force_move(last_moveend,(last_moveend-8))
 	global iswhitemove
 	iswhitemove = not iswhitemove
 
