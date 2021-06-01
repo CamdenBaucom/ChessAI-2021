@@ -130,6 +130,7 @@ last_moveend = 0
 last_piece_taken = ''
 old_movestart = []
 old_moveend = []
+old_piece_taken = []
 
 def test_move(movestart,moveend):
 	if move_is_legal(movestart,moveend) == True:
@@ -149,10 +150,6 @@ def test_move(movestart,moveend):
 		return False
 
 def move(movestart,moveend):
-#	if move_is_legal(movestart,moveend) == True:
-#		if leads_to_check(movestart,moveend) == False:
-#			if (in_check()) == False:
-	#in_check_moves()
 	if (movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end)):
 		global last_piece_taken
 		last_piece_taken = board64[moveend]
@@ -167,6 +164,8 @@ def move(movestart,moveend):
 		old_movestart.append(movestart)
 		global old_moveend
 		old_moveend.append(moveend)
+		global old_piece_taken
+		old_piece_taken.append(last_piece_taken)
 		global iswhitemove
 		iswhitemove = not iswhitemove
 	else:
@@ -185,16 +184,8 @@ def force_move(movestart,moveend):
 	old_movestart.append(movestart)
 	global old_moveend
 	old_moveend.append(moveend)
-
-#def force_test_move(movestart,moveend):
-#	global last_piece_taken
-#	last_piece_taken = board64[moveend]
-#	board64[moveend] = board64[movestart]
-#	board64[movestart] = '0'
-#	global last_movestart
-#	last_movestart = movestart
-#	global last_moveend
-#	last_moveend = moveend
+	global old_piece_taken
+	old_piece_taken.append(last_piece_taken)
 
 def unmove():
 	global last_movestart
@@ -202,18 +193,25 @@ def unmove():
 	global last_piece_taken
 	board64[last_movestart] = board64[last_moveend]
 	board64[last_moveend] = last_piece_taken
-	global castling_unmove_state
-#	if (len(old_movestart) > 2) and (castling_unmove_state == True):
-#		board64[old_movestart[-1]] = board64[old_moveend[-1]]
-#		board64[old_moveend[-1]] = last_piece_taken
-	global en_passant_unmove_state
-#	if (len(old_movestart) > 1) and (en_passant_unmove_state == True):
-#		if last_piece_taken == 'p':
-#			force_move(last_moveend,(last_moveend+8))
-#		else:
-#			force_move(last_moveend,(last_moveend-8))
 	global iswhitemove
 	iswhitemove = not iswhitemove
+
+def unmove_depth(depth):
+	global old_movestart
+	global old_moveend
+	global old_piece_taken
+
+#
+#
+#
+#
+#
+#Need to Work on this
+#
+#
+#
+#
+#
 
 def move_is_legal(movestart,moveend):
 	if (movestart != moveend) and (iswhitemove == True and (board120[(move_convtr_64120(movestart))] in ('P','R','N','B','Q','K'))) or (iswhitemove == False and (board120[(move_convtr_64120(movestart))] in ('p','r','n','b','q','k'))):
@@ -693,23 +691,37 @@ def one_player():
 	x = True
 	global one_player
 	global comp_goes_first
+	global random_moves
 	while x == True:
 		player = input('Would you like to play in One player (versus the Computer) or Two player?\n')
 		if player in ('one','One','1'):
-			while x == True:
+			y = True
+			while y == True:
 				first_move = input('Would you like to go first or second?\n')
 				if first_move in ('first','First','1st','1','one','One'):
 					one_player = True
 					comp_goes_first = False
-					x = False
+					y = False
 				elif first_move in ('second','Second','2nd','2','two','Two'):
 					one_player = True
 					comp_goes_first = True
-					x = False
+					y = False
 				elif first_move in ('exit','Exit','leave','Leave'):
 					quit()
 				else:
 					print('Please type first or second to play. Otherwise type exit to leave.')
+			while x == True:
+				randomized_moves = input('Would you like the Computer to use random moves?\n')
+				if randomized_moves in ('yes','Yes','yup','Yup','yeah','yeah'):
+					random_moves = True
+					x = False
+				elif randomized_moves in ('no','No'):
+					random_moves = False
+					x = False
+				elif randomized_moves in ('exit','Exit','leave','Leave'):
+					quit()
+				else:
+					print('Please type yes or no to play. Otherwise type exit to leave.')
 		elif player in ('two','Two','2'):
 			one_player = False
 			x = False
@@ -718,6 +730,37 @@ def one_player():
 		else:
 			print('Please type one or two to play. Otherwise type exit to leave.')
 
+def board_eval():
+	global white_board_eval
+	global black_board_eval
+	white_board_eval = 0
+	black_board_eval = 0
+	for i in range(64):
+		if board64[i] == 'P':
+			white_board_eval += 1
+		elif board64[i] == 'p':
+			black_board_eval += 1
+		elif board64[i] == 'N':
+			white_board_eval += 3
+		elif board64[i] == 'n':
+			black_board_eval += 3
+		elif board64[i] == 'B':
+			white_board_eval += 3
+		elif board64[i] == 'b':
+			black_board_eval += 3
+		elif board64[i] == 'R':
+			white_board_eval += 5
+		elif board64[i] == 'r':
+			black_board_eval += 5
+		elif board64[i] == 'Q':
+			white_board_eval += 9
+		elif board64[i] == 'q':
+			black_board_eval += 9
+		elif board64[i] == 'K':
+			white_board_eval += 500
+		elif board64[i] == 'k':
+			black_board_eval += 500
+
 def play():
 	while (end_conditions() == True):
 		show_board()
@@ -725,6 +768,11 @@ def play():
 			print("White's Move")
 		else:
 			print("Black's Move")
+		#board_eval()
+		#print("White Board Evaluation: ")
+		#print(white_board_eval)
+		#print("Black Board Evalutaion: ")
+		#print(black_board_eval)
 		#print(in_check_eligible_move_start)
 		#print(in_check_eligible_move_end)
 		if (one_player == False) or ((one_player == True) and iswhitemove != comp_goes_first):
@@ -733,11 +781,13 @@ def play():
 			x = board_notation_convtr(x)
 			y = board_notation_convtr(y)
 		else:
-			random_choice = len(in_check_eligible_move_start) - 1
-			print(random_choice)
-			random_choice = random.randint(0,random_choice)
-			x = in_check_eligible_move_start[random_choice]
-			y = in_check_eligible_move_end[random_choice]
+			if random_moves == True:
+				random_choice = len(in_check_eligible_move_start) - 1
+				random_choice = random.randint(0,random_choice)
+				x = in_check_eligible_move_start[random_choice]
+				y = in_check_eligible_move_end[random_choice]
+			else:
+				print("Not Supported")
 		move(x,y)
 		upd_board_64120()
 		castling()
