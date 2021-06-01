@@ -196,22 +196,14 @@ def unmove():
 	global iswhitemove
 	iswhitemove = not iswhitemove
 
-def unmove_depth(depth):
+def unmove_more():
 	global old_movestart
 	global old_moveend
 	global old_piece_taken
-
-#
-#
-#
-#
-#
-#Need to Work on this
-#
-#
-#
-#
-#
+	board64[old_movestart.pop(-1)] = board64[old_moveend.pop(-1)]
+	board64[old_moveend.pop(-1)] = old_piece_taken.pop(-1)
+	global iswhitemove
+	iswhitemove = not iswhitemove
 
 def move_is_legal(movestart,moveend):
 	if (movestart != moveend) and (iswhitemove == True and (board120[(move_convtr_64120(movestart))] in ('P','R','N','B','Q','K'))) or (iswhitemove == False and (board120[(move_convtr_64120(movestart))] in ('p','r','n','b','q','k'))):
@@ -733,6 +725,7 @@ def one_player():
 def board_eval():
 	global white_board_eval
 	global black_board_eval
+	global iswhitemove
 	white_board_eval = 0
 	black_board_eval = 0
 	for i in range(64):
@@ -760,6 +753,43 @@ def board_eval():
 			white_board_eval += 500
 		elif board64[i] == 'k':
 			black_board_eval += 500
+	if (one_player == True):
+		if (comp_goes_first == True):
+			comp_board_eval = white_board_eval
+			opp_board_eval = black_board_eval
+		else:
+			comp_board_eval = black_board_eval
+			opp_board_eval = white_board_eval
+
+#for var in range(0,4):
+#   mydict = {}
+#   opp_move_start = "opp_move_start" + str(var)
+#   mydict[opp_move_start] = [1,2,3,4]
+#   opp_move_end = "opp_move_end" + str(var)
+#   mydict[opp_move_end] = [5,6,7,8]
+#   move_start = "opp_move_start" + str(var)
+#   move_end = "opp_move_end" + str(var)
+#   print(mydict[move_start][var])
+#   print(mydict[move_end][var])
+
+def comp_moves(depth):
+	global best_move_start
+	global best_move_end
+	best_move_start = in_check_eligible_move_start[-1]
+	best_move_end = in_check_eligible_move_end[-1]
+	depth_move_start_1 = in_check_eligible_move_start
+	depth_move_end_1 = in_check_eligible_move_end
+	x = True
+	while x == True:
+		current_move_start = in_check_eligible_move_start.pop(-1)
+		current_move_end = in_check_eligible_move_end.pop(-1)
+		move(current_move_start,current_move_end)
+		for i in range(1, depth):
+			in_check_moves()
+			move(in_check_eligible_move_start.pop(-1),in_check_eligible_move_end.pop(-1))
+			board_eval()
+			#comp best move equals 0, replace if greater
+			unmove()
 
 def play():
 	while (end_conditions() == True):
