@@ -250,7 +250,7 @@ def move_pawn_is_legal(movestart,moveend):
 			return True
 		else:
 			return False
-	elif (movestart == (moveend + 7*pawn_move_direction) or movestart == (moveend + 9*pawn_move_direction)) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)) and board120[(move_convtr_64120(moveend))] != '0':
+	elif ((movestart == (moveend + 7*pawn_move_direction)) or (movestart == (moveend + 9*pawn_move_direction))) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)) and board120[(move_convtr_64120(moveend))] != '0':
 		if movestart not in (8,16,24,32,40,48,15,23,31,39,47,55):
 			return True
 		elif movestart == moveend + 7*pawn_move_direction and ((pawn_move_direction == -1 and movestart in (15,23,31,39,47,55)) or (pawn_move_direction == 1 and movestart in (8,16,24,32,40,48))):
@@ -313,38 +313,44 @@ def pawn_promotion():
 	if (len(old_moveend) > 0) and (old_moveend[-1] in (0,1,2,3,4,5,6,7,56,57,58,59,60,61,62,63)) and (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')):
 		pawn_promotion_unmove_old_value = board120[move_convtr_64120(old_moveend[-1])]
 		pawn_promotion_unmove_state = True
-		while new_piece_input_works == False:
-			new_piece_input = input("Type what piece you want to promote your pawn to:\n")
+		if (one_player == True) and (iswhitemove != comp_goes_first):
 			if (old_moveend[-1] in (0,1,2,3,4,5,6,7)):
-				if new_piece_input in ("Knight","knight","N","n","Night","night","Nite","nite","Horse","horse"):
-					new_piece = "N"
-					new_piece_input_works = True
-				elif new_piece_input in ("Rook","rook","R","r","Rock","rock","Rok","rok","Castle","castle","Tower","tower"):
-					new_piece = "R"
-					new_piece_input_works = True
-				elif new_piece_input in ("Bishop","bishop","B","b","Priest","priest"):
-					new_piece = "B"
-					new_piece_input_works = True
-				elif new_piece_input in ("Queen","queen","Q","q"):
-					new_piece = "Q"
-					new_piece_input_works = True
-				else:
-					print("Please type a valid piece (Kings and Pawns are not allowed)")
+				new_piece = "Q"
 			else:
-				if new_piece_input in ("Knight","knight","N","n","Night","night","Nite","nite","Horse","horse"):
-					new_piece = "n"
-					new_piece_input_works = True
-				elif new_piece_input in ("Rook","rook","R","r","Rock","rock","Rok","rok","Castle","castle","Tower","tower"):
-					new_piece = "r"
-					new_piece_input_works = True
-				elif new_piece_input in ("Bishop","bishop","B","b","Priest","priest"):
-					new_piece = "b"
-					new_piece_input_works = True
-				elif new_piece_input in ("Queen","queen","Q","q"):
-					new_piece = "q"
-					new_piece_input_works = True
+				new_piece = 'q'
+		else:
+			while new_piece_input_works == False:
+				new_piece_input = input("Type what piece you want to promote your pawn to:\n")
+				if (old_moveend[-1] in (0,1,2,3,4,5,6,7)):
+					if new_piece_input in ("Knight","knight","N","n","Night","night","Nite","nite","Horse","horse"):
+						new_piece = "N"
+						new_piece_input_works = True
+					elif new_piece_input in ("Rook","rook","R","r","Rock","rock","Rok","rok","Castle","castle","Tower","tower"):
+						new_piece = "R"
+						new_piece_input_works = True
+					elif new_piece_input in ("Bishop","bishop","B","b","Priest","priest"):
+						new_piece = "B"
+						new_piece_input_works = True
+					elif new_piece_input in ("Queen","queen","Q","q"):
+						new_piece = "Q"
+						new_piece_input_works = True
+					else:
+						print("Please type a valid piece (Kings and Pawns are not allowed)")
 				else:
-					print("Please type a valid piece (Kings and Pawns are not allowed)")
+					if new_piece_input in ("Knight","knight","N","n","Night","night","Nite","nite","Horse","horse"):
+						new_piece = "n"
+						new_piece_input_works = True
+					elif new_piece_input in ("Rook","rook","R","r","Rock","rock","Rok","rok","Castle","castle","Tower","tower"):
+						new_piece = "r"
+						new_piece_input_works = True
+					elif new_piece_input in ("Bishop","bishop","B","b","Priest","priest"):
+						new_piece = "b"
+						new_piece_input_works = True
+					elif new_piece_input in ("Queen","queen","Q","q"):
+						new_piece = "q"
+						new_piece_input_works = True
+					else:
+						print("Please type a valid piece (Kings and Pawns are not allowed)")
 		board64[old_moveend[-1]] = new_piece
 
 
@@ -683,21 +689,55 @@ def end_conditions():
 	else:
 		return True
 
+def one_player():
+	x = True
+	global one_player
+	global comp_goes_first
+	while x == True:
+		player = input('Would you like to play in One player (versus the Computer) or Two player?\n')
+		if player in ('one','One','1'):
+			while x == True:
+				first_move = input('Would you like to go first or second?\n')
+				if first_move in ('first','First','1st','1','one','One'):
+					one_player = True
+					comp_goes_first = False
+					x = False
+				elif first_move in ('second','Second','2nd','2','two','Two'):
+					one_player = True
+					comp_goes_first = True
+					x = False
+				elif first_move in ('exit','Exit','leave','Leave'):
+					quit()
+				else:
+					print('Please type first or second to play. Otherwise type exit to leave.')
+		elif player in ('two','Two','2'):
+			one_player = False
+			x = False
+		elif player in ('exit','Exit','Leave','leave'):
+			quit()
+		else:
+			print('Please type one or two to play. Otherwise type exit to leave.')
+
 def play():
 	while (end_conditions() == True):
-		#both_eligible_moves()
 		show_board()
-		#in_check_moves()
 		if iswhitemove == True:
 			print("White's Move")
 		else:
 			print("Black's Move")
-		print(in_check_eligible_move_start)
-		print(in_check_eligible_move_end)
-		x = input('Starting move:\n')
-		y = input('Ending move:\n')
-		x = board_notation_convtr(x)
-		y = board_notation_convtr(y)
+		#print(in_check_eligible_move_start)
+		#print(in_check_eligible_move_end)
+		if (one_player == False) or ((one_player == True) and iswhitemove != comp_goes_first):
+			x = input('Starting move:\n')
+			y = input('Ending move:\n')
+			x = board_notation_convtr(x)
+			y = board_notation_convtr(y)
+		else:
+			random_choice = len(in_check_eligible_move_start) - 1
+			print(random_choice)
+			random_choice = random.randint(0,random_choice)
+			x = in_check_eligible_move_start[random_choice]
+			y = in_check_eligible_move_end[random_choice]
 		move(x,y)
 		upd_board_64120()
 		castling()
@@ -705,6 +745,7 @@ def play():
 		pawn_promotion()
 		upd_board_64120()
 
-
+import random
 upd_board_12064()
+one_player()
 play()
