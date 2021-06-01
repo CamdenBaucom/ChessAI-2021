@@ -726,6 +726,8 @@ def board_eval():
 	global white_board_eval
 	global black_board_eval
 	global iswhitemove
+	global comp_board_eval
+	global opp_board_eval
 	white_board_eval = 0
 	black_board_eval = 0
 	for i in range(64):
@@ -775,21 +777,43 @@ def board_eval():
 def comp_moves(depth):
 	global best_move_start
 	global best_move_end
+	in_check_moves()
 	best_move_start = in_check_eligible_move_start[-1]
 	best_move_end = in_check_eligible_move_end[-1]
 	depth_move_start_1 = in_check_eligible_move_start
 	depth_move_end_1 = in_check_eligible_move_end
 	x = True
-	while x == True:
-		current_move_start = in_check_eligible_move_start.pop(-1)
-		current_move_end = in_check_eligible_move_end.pop(-1)
-		move(current_move_start,current_move_end)
-		for i in range(1, depth):
+	mydict = {}
+	for i in range(1,(depth + 1)):
+		while x == True:
 			in_check_moves()
-			move(in_check_eligible_move_start.pop(-1),in_check_eligible_move_end.pop(-1))
-			board_eval()
-			#comp best move equals 0, replace if greater
+			mydict["move_start_depth" + str(i)] = in_check_eligible_move_start
+			mydict["move_end_depth" + str(i)] = in_check_eligible_move_end
+			current_move_start = mydict["move_start_depth" + str(i)].pop(-1)
+			current_move_end = mydict["move_end_depth" + str(i)].pop(-1)
+			move(current_move_start,current_move_end)
+			in_check_moves()
+			best_opp_board_eval = 0
+			mydict["opp_move_start_depth" + str(i)] = []
+			mydict["opp_move_end_depth" + str(i)] = []
+			while (len(in_check_eligible_move_start) > 0):
+				move(in_check_eligible_move_start[-1],in_check_eligible_move_end[-1])
+				board_eval()
+				if opp_board_eval == best_opp_board_eval:
+					mydict["opp_move_start_depth" + str(i)].append(in_check_eligible_move_start[-1])
+					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
+				elif opp_board_eval > best_opp_board_eval:
+					best_opp_board_eval = opp_board_eval
+					mydict["opp_move_start_depth" + str(i)].clear()
+					mydict["opp_move_end_depth" + str(i)].clear()
+					mydict["opp_move_start_depth" + str(i)].append(in_check_eligible_move_start[-1])
+					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
+				del in_check_eligible_move_start[-1]
+				del in_check_eligible_move_end[-1]
+				unmove()
 			unmove()
+			if len(mydict["move_start_depth" + str(i)]) == 0:
+				x = False
 
 def play():
 	while (end_conditions() == True):
@@ -828,4 +852,7 @@ def play():
 import random
 upd_board_12064()
 one_player()
+comp_moves(1)
+print(mydict["opp_move_start_depth1"])
+print(mydict["opp_move_end_depth1"])
 play()
