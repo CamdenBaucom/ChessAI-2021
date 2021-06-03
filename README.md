@@ -121,8 +121,32 @@ Full Board
 ```
 
 #### Backend Conversions
+Since the program would be running off the 120 square and 64 square boards at different points, I needed a way to independently update the value of one on to the other, so I created two functions to update the value of 64 with 120, and 120 with 64.  To do this I used the enumerate() function which outputs two things at each index: the index number, and the value at that index. So in the code below, index is the index number, and sqr is the value at that index of board120. Then looping through all indexes and values of board120, if the value was not -1, it would be pushed to the 64 square board.
 
+```ruby
+def upd_board_12064():
+	for index, sqr in enumerate(board120):
+		if not (sqr == '-1'):
+			global updboardcounter12064
+			board64[updboardcounter12064] = board120[index]
+			updboardcounter12064 += 1
+	updboardcounter12064 = 0
+```
 
+With that complete, the only other big conversion problem between the boards was converting board positions on the 64 square board, where inputs would arrive, to the 120 square board, through which the inputs needed to go. I spent a lot of time on a convoluted system of calculating the values, before eventually realizing that all I needed to do was find out how many times the 64 square board position went onto a new row, again done by floor division, and multiply that by two (to simulate the two -1 values in between each row on the 120 square board) and then add that with 21 (the number of -1 values before everything else on the 120 square board) and the original position. 
+
+```ruby
+def move_convtr_64120(movestart):
+	move_convtr_64120_var1 = movestart // 8
+	move_convtr_64120_var1 = int(move_convtr_64120_var1)
+	movestart = movestart + (2*move_convtr_64120_var1) + 21
+	return movestart
+```
+The final piece in the conversion puzzle was converting the chess notation that players put in (A3, D6, H7, etc.) into the corresponding index on the 64 square board so that the computer could understand the move. To do this, I essentially just turned each letter of the input into an index in an array, and I searched that array for values to update the numerical position.
+
+```ruby
+board_notation_char = [char for char in movestart]
+```
 
 #### Movement
 
