@@ -196,15 +196,6 @@ def unmove():
 	global iswhitemove
 	iswhitemove = not iswhitemove
 
-def unmove_more():
-	global old_movestart
-	global old_moveend
-	global old_piece_taken
-	board64[old_movestart.pop(-1)] = board64[old_moveend.pop(-1)]
-	board64[old_moveend.pop(-1)] = old_piece_taken.pop(-1)
-	global iswhitemove
-	iswhitemove = not iswhitemove
-
 def move_is_legal(movestart,moveend):
 	if (movestart != moveend) and (iswhitemove == True and (board120[(move_convtr_64120(movestart))] in ('P','R','N','B','Q','K'))) or (iswhitemove == False and (board120[(move_convtr_64120(movestart))] in ('p','r','n','b','q','k'))):
 		if board120[(move_convtr_64120(movestart))] in ('p','P'):
@@ -747,7 +738,15 @@ def board_eval():
 		else:
 			comp_board_eval = black_board_eval
 			opp_board_eval = white_board_eval
-
+#def unmove_more():
+#	global old_movestart
+#	global old_moveend
+#	global old_piece_taken
+#	board64[old_movestart.pop(-1)] = board64[old_moveend.pop(-1)]
+#	board64[old_moveend.pop(-1)] = old_piece_taken.pop(-1)
+#	global iswhitemove
+#	iswhitemove = not iswhitemove
+			
 #def comp_moves(depth):
 #	global best_move_start
 #	global best_move_end
@@ -784,8 +783,8 @@ def board_eval():
 #					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
 #				del in_check_eligible_move_start[-1]
 #				del in_check_eligible_move_end[-1]
-#				unmove()
-#			unmove()
+#				unmove_more()
+#			unmove_more()
 #			if len(mydict["move_start_depth" + str(i)]) == 0:
 #				x = False
 
