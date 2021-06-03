@@ -149,8 +149,46 @@ board_notation_char = [char for char in movestart]
 ```
 
 #### Movement
+To actually make moves the program checks full eligibility requirements, discussed later, then updates the value of the end position with the value of the starting position and the value of the starting position with 0. Additionally, the program stores the value of the end position before the new piece moved there and the very last starting and ending positions, as well as appending those last starting and ending positions into an array of all prior moves. Finally it changes the turn by flipping the value of the iswhitemove boolean state.
 
+```ruby
+def move(movestart,moveend):
+	if (movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end)):
+		global last_piece_taken
+		last_piece_taken = board64[moveend]
+		board64[moveend] = board64[movestart]
+		board64[movestart] = '0'
+		print("Possible")
+		global last_movestart
+		last_movestart = movestart
+		global last_moveend
+		last_moveend = moveend
+		global old_movestart
+		old_movestart.append(movestart)
+		global old_moveend
+		old_moveend.append(moveend)
+		global old_piece_taken
+		old_piece_taken.append(last_piece_taken)
+		global iswhitemove
+		iswhitemove = not iswhitemove
+	else:
+		print("Not possible")
+```
 
+Accompanying move() are two other move functions with different eligibility requirements. The first of the two is test_move() which only checks basic eligibility is important in stopping potential feedback loops when calculating total eligibility. The other, force_move() has no requirements and accompanies two special moves, en passant and castling, that occur over two stages. 
+
+Finally unmove() undoes a move by reversing the prior formula and using the stored value of the last piece taken. 
+
+```ruby
+def unmove():
+	global last_movestart
+	global last_moveend
+	global last_piece_taken
+	board64[last_movestart] = board64[last_moveend]
+	board64[last_moveend] = last_piece_taken
+	global iswhitemove
+	iswhitemove = not iswhitemove
+```
 
 #### Basic Eligibility
 
