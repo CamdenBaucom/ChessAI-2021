@@ -178,8 +178,160 @@ def unmove():
 	iswhitemove = not iswhitemove
 ```
 #### Basic Eligibility
-
-
+The first layer of eligibility checks general rules, such as bishops moving diagonally or rooks moving horizontally and vertically. The central hub of sorts is move_is_legal(), which identifies what piece is moving and then checks the piece specific functions that determine eligibility.
+```ruby
+if board120[(move_convtr_64120(movestart))] in ('p','P'):
+	return move_pawn_is_legal(movestart,moveend)
+elif board120[(move_convtr_64120(movestart))] in ('r','R'):
+	return move_rook_is_legal(movestart,moveend)
+elif board120[(move_convtr_64120(movestart))] in ('n','N'):
+	return move_knight_is_legal(movestart,moveend)
+elif board120[(move_convtr_64120(movestart))] in ('b','B'):
+	return move_bishop_is_legal(movestart,moveend)
+elif board120[(move_convtr_64120(movestart))] in ('q','Q'):
+	return move_queen_is_legal(movestart,moveend)
+elif board120[(move_convtr_64120(movestart))] in ('k','K'):
+	return move_king_is_legal(movestart,moveend)
+else:
+	return False
+```
+Pawns can only move in one direction depending on the piece color, or as is represented in the code, the letter case, and so for basic pawn eligibility, the movement direction is established first. From that, pawns can always move eight squares (in the right direction) if the end square is empty (represented by a value of 0 at the position). Additionally, pawns can move 16 squares if the end square is empty and their starting position is on their home row. Finally, pawns can take diagonally, 7 or 9 squares, if an enemy square occupies the position.
+```ruby
+if board120[(move_convtr_64120(movestart))] == 'p':
+	pawn_move_direction = -1
+else:
+	pawn_move_direction = 1
+```
+```ruby
+if movestart == moveend + (8*pawn_move_direction):
+```
+```ruby
+elif (movestart == moveend + (16*pawn_move_direction)) and (((pawn_move_direction == -1) and (movestart in (8,9,10,11,12,13,14,15))) or ((pawn_move_direction == 1) and (movestart in (48,49,50,51,52,53,54,55)))):
+```
+```ruby
+elif ((movestart == (moveend + 7*pawn_move_direction)) or (movestart == (moveend + 9*pawn_move_direction))) and board120[(move_convtr_64120(moveend))] in (can_take(movestart)) and board120[(move_convtr_64120(moveend))] != '0':
+```
+Rooks can move vertically, so in groups of 8 (8, 16, 24, etc.), and horizontally, so to any end square in their row. To calculate that I created a function, horiz_range() that took advantage of the ever useful floor division. 
+```ruby
+def move_rook_is_legal(movestart,moveend):
+	if abs(movestart-moveend) in (8,16,24,32,40,48,56) and (hit_detec(movestart,moveend) == True) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
+		return True
+	elif moveend in horiz_range(movestart) and (hit_detec(movestart, moveend) == True) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
+		return True
+	else:
+		return False
+```
+```ruby
+def horiz_range(movestart):
+	horiz_range_group_lower = movestart//8
+	horiz_range_group_higher = horiz_range_group_lower+1
+	return range(horiz_range_group_lower*8,horiz_range_group_higher*8)
+```
+Knights always move in distances of 6,10,15, or 17 squares, and so after passing the first condition (movement distance), I finally took advantage of the 120 square board. The only problem is that if I were to plug both the starting square and ending squares into the 64 to 120 square converter, it would skip over all the -1s and render the process useless. So, I plugged the starting value into the converter, and then made a math equation to convert the distance traveled on the 64 board to the equivalent distance traveled on the 120 square board. Then by combining the two, and plugging into the 120 square board, I could test the eligibility.
+```ruby
+def move_knight_is_legal(movestart,moveend):
+	if (abs(movestart-moveend) in (6,10,15,17)) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
+		move_knight_sign = -1*(abs(movestart-moveend)) / (movestart-moveend)
+		move_knight_board120_check = ((move_convtr_64120(movestart)) + (((abs(movestart-moveend))+(((abs(movestart-moveend)) // 6) * 2))*move_knight_sign))
+		move_knight_board120_check = int(move_knight_board120_check)
+		if board120[move_knight_board120_check] not in ('-1'):
+			return True
+		else:
+			return False
+	else:
+		return False
+```
+Bishops move in groups of 7 or 9 (7, 14, 21, etc. or 9, 18, 27, etc.). Queens, since they have the movement ability of both bishops and rooks, only have to have an eligible move inside of move_bishop_is_legal() or move_rook_is_legal(). 
+```ruby
+def move_bishop_is_legal(movestart,moveend):
+	if abs(movestart-moveend) in (7,14,21,28,35,42,49,9,18,27,36,45,54,63) and (hit_detec(movestart,moveend) == True) and (board120[(move_convtr_64120(moveend))] in (can_take(movestart))):
+```
+```ruby
+def move_queen_is_legal(movestart,moveend):
+	if (move_bishop_is_legal(movestart,moveend) == True) or (move_rook_is_legal(movestart,moveend) == True):
+```
+Kings, with movement abilities of one square in any direction, can only move a distance of 1, 7, 8,  or 9. As an extra check, movement of 7, 8, or 9 are also checked through the 120 square board.
+```ruby
+def move_king_is_legal(movestart,moveend):
+	if abs(movestart-moveend) in (1,7,8,9):
+		move_king_sign = -abs(movestart-moveend) / (movestart-moveend)
+		move_king_diff = abs(movestart-moveend)
+		move_king_sign = int(move_king_sign)
+		move_king_diff = int(move_king_diff)
+		if abs(movestart-moveend) in (7,8,9):
+			move_king_diff += 2
+		if board120[(move_convtr_64120(movestart))+(move_king_diff*move_king_sign)] in (can_take(movestart)):
+			return True
+		else:
+			return False
+```
+For all the previously mentioned movements, an ending square is eligible if it is either empty or occupied by an enemy piece. So, the simple function, can_take(), returns an array for which the value of the end position must be in.
+```ruby
+def can_take(movestart):
+	if board120[(move_convtr_64120(movestart))].islower() == True:
+		return ['P','R','N','B','Q','K','0']
+	else:
+		return ['p','r','n','b','q','k','0']
+```
+Finally, when a piece moves more than one square in any direction, I had to make sure that there was no piece in between the starting square and ending square. To do this I created a function called hit_detec(), with specific tests for horizontal, vertical, and diagonal movement. For each, I made a range of how many squares it moved, and then checked the in between squares on the 120 square board. For the diagonal movement, I was encountering problems so I tweaked just that one, so that it also checks the final ending position on the 120 square board.
+```ruby
+def hit_detec(movestart,moveend):
+	hit_detec_sign = (moveend-movestart) / abs(moveend-movestart)
+	hit_detec_sign = int(hit_detec_sign)
+	if abs(movestart-moveend) in (8,16,24,32,40,48,56,64):
+		hit_detec_vert_counter = abs(((movestart-moveend) / 8))
+		hit_detec_vert_counter = int(hit_detec_vert_counter)
+		hit_detec_vert_bool = False
+		for i in range(hit_detec_vert_counter):
+			hit_detec_vert_between = i*8
+			if hit_detec_vert_between == 0:
+				hit_detec_vert_bool = True
+			elif board120[(move_convtr_64120(movestart+(hit_detec_sign*hit_detec_vert_between)))] == '0':
+				hit_detec_vert_bool = True
+			else:
+				hit_detec_vert_bool = False
+				return hit_detec_vert_bool
+		return hit_detec_vert_bool
+	elif moveend in horiz_range(movestart):
+		hit_detec_horiz_counter = abs(movestart-moveend)
+		hit_detec_horiz_counter = int(hit_detec_horiz_counter)
+		hit_detec_horiz_bool = False
+		for i in range(hit_detec_horiz_counter):
+			if i == 0:
+				hit_detec_horiz_bool = True
+			elif board120[(move_convtr_64120(movestart+(hit_detec_sign*i)))] == '0':
+				hit_detec_horiz_bool = True
+			else:
+				hit_detec_horiz_bool = False
+				return hit_detec_horiz_bool
+		return hit_detec_horiz_bool
+	else:
+		if abs(movestart-moveend) in (7,14,21,28,35,42,49):
+			hit_detec_diag_counter = abs(((movestart-moveend) / 7))
+			hit_detec_diag_inc = 9
+		else:
+			hit_detec_diag_counter = abs(((movestart-moveend) / 9))
+			hit_detec_diag_inc = 11
+		hit_detec_diag_counter = int(hit_detec_diag_counter)
+		hit_detec_diag_bool = False
+		for i in range(hit_detec_diag_counter):
+			hit_detec_diag_between = i*hit_detec_diag_inc
+			if hit_detec_diag_between == 0:
+				hit_detec_diag_bool = True
+			elif board120[(move_convtr_64120(movestart))+(hit_detec_sign*hit_detec_diag_between)] == '0':
+				hit_detec_diag_bool = True
+				if (i+1 == hit_detec_diag_counter):
+					hit_detec_diag_between += hit_detec_diag_inc
+					if board120[(move_convtr_64120(movestart))+(hit_detec_sign*hit_detec_diag_between)] in (can_take(movestart)):
+						hit_detec_diag_bool = True
+					else:
+						hit_detec_diag_bool = False
+						return hit_detec_diag_bool
+			else:
+				hit_detec_diag_bool = False
+				return hit_detec_diag_bool
+		return hit_detec_diag_bool
+```
 
 #### Specialized Eligibility
 
