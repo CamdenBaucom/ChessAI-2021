@@ -73,9 +73,7 @@ As mentioned in the planning, I created a 120 square board and a 64 square board
 48, 49, 50, 51, 52, 53, 54, 55,
 56, 57, 58, 59, 60, 61, 62, 63
 ```
-
 In terms of actually displaying the board, which as recently mentioned would just be the 64 board, a couple problems had to be solved. Firstly, since the board was an array, if you print it out on its own, it just shows one long line of array elements, without any line skipping. To solve this, I had to turn the array into a string, while inserting newline commands (“\n”) between every eight indexes. To do this, I created an eight element range (8*8 = 64 and a full board) which turned into two variables that were the first and last index of that line on the board. For example, if z was 4, then x would be 32, and y would be 24, corresponding to the fourth row as seen on the 64 square board. But wait a minute, the 24 corresponds correctly, but the 32 is one greater than the 31 seen on the board. This works because the range function starts at its first parameter and goes up to, but does not reach, its last parameters, meaning that the “for z in range(1,9):” would loop through, with values of z at 1,2,3,4,5,6,7, and 8. Now that I have a variable i for which I can access the elements of each board row (0-7, then 8-15, then 16-23, etc.), I can take the individual value of the board at those elements and put it into a string that nicely formats the values into little boxes. Each row is then attached a newline command (“\n”), with the next row added on at the end, due to the string's ability to essentially append themselves with a simple +. With that sorted, the second problem is formatting the board so that the player can easily see where rows 1-8 and columns a-h are, as that is standard chess notation. Since I already had values in groups of 8, I took advantage of something called floor division, which finds the largest integer quotient whose product with the divisor does not exceed the dividend, in other words the quotient rounded down without any remainder. This gave me one number for each group which I printed in front of each row. Then at the end, I simply added another sting with the letters a-h aligned with each column.
-
 ```ruby
 for z in range(1,9):
 	y = (z-1)*8
@@ -95,7 +93,6 @@ for z in range(1,9):
 boardstr = boardstr + "    a    b    c    d    e    f    g    h"
 print(boardstr)
 ```
-
 ```
 Full Board with numbers
 8 [ 0 ][ 1 ][ 2 ][ 3 ][ 4 ][ 5 ][ 6 ][ 7 ]
@@ -119,10 +116,8 @@ Full Board
 1 [ R ][ N ][ B ][ Q ][ K ][ B ][ N ][ R ]
     a    b    c    d    e    f    g    h     
 ```
-
 #### Backend Conversions
 Since the program would be running off the 120 square and 64 square boards at different points, I needed a way to independently update the value of one on to the other, so I created two functions to update the value of 64 with 120, and 120 with 64.  To do this I used the enumerate() function which outputs two things at each index: the index number, and the value at that index. So in the code below, index is the index number, and sqr is the value at that index of board120. Then looping through all indexes and values of board120, if the value was not -1, it would be pushed to the 64 square board.
-
 ```ruby
 def upd_board_12064():
 	for index, sqr in enumerate(board120):
@@ -132,9 +127,7 @@ def upd_board_12064():
 			updboardcounter12064 += 1
 	updboardcounter12064 = 0
 ```
-
 With that complete, the only other big conversion problem between the boards was converting board positions on the 64 square board, where inputs would arrive, to the 120 square board, through which the inputs needed to go. I spent a lot of time on a convoluted system of calculating the values, before eventually realizing that all I needed to do was find out how many times the 64 square board position went onto a new row, again done by floor division, and multiply that by two (to simulate the two -1 values in between each row on the 120 square board) and then add that with 21 (the number of -1 values before everything else on the 120 square board) and the original position. 
-
 ```ruby
 def move_convtr_64120(movestart):
 	move_convtr_64120_var1 = movestart // 8
@@ -143,14 +136,11 @@ def move_convtr_64120(movestart):
 	return movestart
 ```
 The final piece in the conversion puzzle was converting the chess notation that players put in (A3, D6, H7, etc.) into the corresponding index on the 64 square board so that the computer could understand the move. To do this, I essentially just turned each letter of the input into an index in an array, and I searched that array for values to update the numerical position.
-
 ```ruby
 board_notation_char = [char for char in movestart]
 ```
-
 #### Movement
 To actually make moves the program checks full eligibility requirements, discussed later, then updates the value of the end position with the value of the starting position and the value of the starting position with 0. Additionally, the program stores the value of the end position before the new piece moved there and the very last starting and ending positions, as well as appending those last starting and ending positions into an array of all prior moves. Finally it changes the turn by flipping the value of the iswhitemove boolean state.
-
 ```ruby
 def move(movestart,moveend):
 	if (movestart in (in_check_eligible_move_start)) and (moveend in (in_check_eligible_move_end)):
@@ -174,11 +164,9 @@ def move(movestart,moveend):
 	else:
 		print("Not possible")
 ```
-
 Accompanying move() are two other move functions with different eligibility requirements. The first of the two is test_move() which only checks basic eligibility is important in stopping potential feedback loops when calculating total eligibility. The other, force_move() has no requirements and accompanies two special moves, en passant and castling, that occur over two stages. 
 
 Finally unmove() undoes a move by reversing the prior formula and using the stored value of the last piece taken. 
-
 ```ruby
 def unmove():
 	global last_movestart
@@ -189,7 +177,6 @@ def unmove():
 	global iswhitemove
 	iswhitemove = not iswhitemove
 ```
-
 #### Basic Eligibility
 
 
