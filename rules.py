@@ -413,7 +413,6 @@ def move_king_is_legal(movestart,moveend):
 		return False
 
 def castling_not_through_check(movestart,moveend):
-	#global iswhitemove
 	castling_movement_direc = (movestart-moveend) / abs(movestart-moveend)
 	opp_eligible_moves()
 	castling_inbetween_move = movestart-(1*castling_movement_direc)
@@ -614,7 +613,6 @@ def leads_to_check(movestart,moveend):
 			return False
 	else:
 		iswhitemove = not iswhitemove
-		#print("Not an eligible move")
 
 def in_check_moves():
 	global in_check_eligible_move_start
@@ -687,33 +685,20 @@ def one_player():
 	while x == True:
 		player = input('Would you like to play in One player (versus the Computer) or Two player?\n')
 		if player in ('one','One','1'):
-			y = True
-			while y == True:
+			while x == True:
 				first_move = input('Would you like to go first or second?\n')
 				if first_move in ('first','First','1st','1','one','One'):
 					one_player = True
 					comp_goes_first = False
-					y = False
+					x = False
 				elif first_move in ('second','Second','2nd','2','two','Two'):
 					one_player = True
 					comp_goes_first = True
-					y = False
+					x = False
 				elif first_move in ('exit','Exit','leave','Leave'):
 					quit()
 				else:
 					print('Please type first or second to play. Otherwise type exit to leave.')
-			while x == True:
-				randomized_moves = input('Would you like the Computer to use random moves?\n')
-				if randomized_moves in ('yes','Yes','yup','Yup','yeah','yeah'):
-					random_moves = True
-					x = False
-				elif randomized_moves in ('no','No'):
-					random_moves = False
-					x = False
-				elif randomized_moves in ('exit','Exit','leave','Leave'):
-					quit()
-				else:
-					print('Please type yes or no to play. Otherwise type exit to leave.')
 		elif player in ('two','Two','2'):
 			one_player = False
 			x = False
@@ -763,57 +748,46 @@ def board_eval():
 			comp_board_eval = black_board_eval
 			opp_board_eval = white_board_eval
 
-#for var in range(0,4):
-#   mydict = {}
-#   opp_move_start = "opp_move_start" + str(var)
-#   mydict[opp_move_start] = [1,2,3,4]
-#   opp_move_end = "opp_move_end" + str(var)
-#   mydict[opp_move_end] = [5,6,7,8]
-#   move_start = "opp_move_start" + str(var)
-#   move_end = "opp_move_end" + str(var)
-#   print(mydict[move_start][var])
-#   print(mydict[move_end][var])
-
-def comp_moves(depth):
-	global best_move_start
-	global best_move_end
-	in_check_moves()
-	best_move_start = in_check_eligible_move_start[-1]
-	best_move_end = in_check_eligible_move_end[-1]
-	depth_move_start_1 = in_check_eligible_move_start
-	depth_move_end_1 = in_check_eligible_move_end
-	x = True
-	mydict = {}
-	for i in range(1,(depth + 1)):
-		while x == True:
-			in_check_moves()
-			mydict["move_start_depth" + str(i)] = in_check_eligible_move_start
-			mydict["move_end_depth" + str(i)] = in_check_eligible_move_end
-			current_move_start = mydict["move_start_depth" + str(i)].pop(-1)
-			current_move_end = mydict["move_end_depth" + str(i)].pop(-1)
-			move(current_move_start,current_move_end)
-			in_check_moves()
-			best_opp_board_eval = 0
-			mydict["opp_move_start_depth" + str(i)] = []
-			mydict["opp_move_end_depth" + str(i)] = []
-			while (len(in_check_eligible_move_start) > 0):
-				move(in_check_eligible_move_start[-1],in_check_eligible_move_end[-1])
-				board_eval()
-				if opp_board_eval == best_opp_board_eval:
-					mydict["opp_move_start_depth" + str(i)].append(in_check_eligible_move_start[-1])
-					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
-				elif opp_board_eval > best_opp_board_eval:
-					best_opp_board_eval = opp_board_eval
-					mydict["opp_move_start_depth" + str(i)].clear()
-					mydict["opp_move_end_depth" + str(i)].clear()
-					mydict["opp_move_start_depth" + str(i)].append(in_check_eligible_move_start[-1])
-					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
-				del in_check_eligible_move_start[-1]
-				del in_check_eligible_move_end[-1]
-				unmove()
-			unmove()
-			if len(mydict["move_start_depth" + str(i)]) == 0:
-				x = False
+#def comp_moves(depth):
+#	global best_move_start
+#	global best_move_end
+#	in_check_moves()
+#	best_move_start = in_check_eligible_move_start[-1]
+#	best_move_end = in_check_eligible_move_end[-1]
+#	depth_move_start_1 = in_check_eligible_move_start
+#	depth_move_end_1 = in_check_eligible_move_end
+#	x = True
+#	mydict = {}
+#	for i in range(1,(depth + 1)):
+#		while x == True:
+#			in_check_moves()
+#			mydict["move_start_depth" + str(i)] = in_check_eligible_move_start
+#			mydict["move_end_depth" + str(i)] = in_check_eligible_move_end
+#			current_move_start = mydict["move_start_depth" + str(i)].pop(-1)
+#			current_move_end = mydict["move_end_depth" + str(i)].pop(-1)
+#			move(current_move_start,current_move_end)
+#			in_check_moves()
+#			best_opp_board_eval = 0
+#			mydict["opp_move_start_depth" + str(i)] = []
+#			mydict["opp_move_end_depth" + str(i)] = []
+#			while (len(in_check_eligible_move_start) > 0):
+#				move(in_check_eligible_move_start[-1],in_check_eligible_move_end[-1])
+#				board_eval()
+#				if opp_board_eval == best_opp_board_eval:
+#					mydict["opp_move_start_depth" + str(i)].append(in_check_eligible_move_start[-1])
+#					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
+#				elif opp_board_eval > best_opp_board_eval:
+#					best_opp_board_eval = opp_board_eval
+#					mydict["opp_move_start_depth" + str(i)].clear()
+#					mydict["opp_move_end_depth" + str(i)].clear()
+#					mydict["opp_move_start_depth" + str(i)].append(in_check_eligible_move_start[-1])
+#					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
+#				del in_check_eligible_move_start[-1]
+#				del in_check_eligible_move_end[-1]
+#				unmove()
+#			unmove()
+#			if len(mydict["move_start_depth" + str(i)]) == 0:
+#				x = False
 
 def play():
 	while (end_conditions() == True):
@@ -822,26 +796,16 @@ def play():
 			print("White's Move")
 		else:
 			print("Black's Move")
-		#board_eval()
-		#print("White Board Evaluation: ")
-		#print(white_board_eval)
-		#print("Black Board Evalutaion: ")
-		#print(black_board_eval)
-		#print(in_check_eligible_move_start)
-		#print(in_check_eligible_move_end)
 		if (one_player == False) or ((one_player == True) and iswhitemove != comp_goes_first):
 			x = input('Starting move:\n')
 			y = input('Ending move:\n')
 			x = board_notation_convtr(x)
 			y = board_notation_convtr(y)
 		else:
-			if random_moves == True:
-				random_choice = len(in_check_eligible_move_start) - 1
-				random_choice = random.randint(0,random_choice)
-				x = in_check_eligible_move_start[random_choice]
-				y = in_check_eligible_move_end[random_choice]
-			else:
-				print("Not Supported")
+			random_choice = len(in_check_eligible_move_start) - 1
+			random_choice = random.randint(0,random_choice)
+			x = in_check_eligible_move_start[random_choice]
+			y = in_check_eligible_move_end[random_choice]
 		move(x,y)
 		upd_board_64120()
 		castling()
@@ -852,7 +816,4 @@ def play():
 import random
 upd_board_12064()
 one_player()
-comp_moves(1)
-print(mydict["opp_move_start_depth1"])
-print(mydict["opp_move_end_depth1"])
 play()
