@@ -30,15 +30,22 @@ Essentially, the idea is that the computer chooses random moves for both sides g
 ### Advanced Additions
 If there is enough time, I hope to implement two systems that will greatly increase the computer's level of play. First is an opening book, which stores commonly used and studied game opening which the computer chooses randomly from to start the game. This eliminates early game move searching and evaluating, speeding up the game and making each move unique. The second is an Endgame book, which stores common endgames with known outcomes and searches the board to see if they are applicable. A very basic version of this will already be implemented in the basic game rules, in the form of checking to see if there is enough pieces on the board to produce a win; for example, if there is only two kings and bishop on the board it is impossible for either side to win and should automatically be called a draw.
 
-## Timeline
-- [ ] April 16: Working on basic rules 
-- [ ] April 23: Working on basic rules
-- [ ] April 30: Working on basic rules
-- [ ] May 7: Done with basic rules
-- [ ] May 14: Board Evaluation
-- [ ] May 21: Working on Min/Max Alpha/Beta
-- [ ] May 28: Working on Min/Max Alpha/Beta
+### Timeline
+- [X] April 16: Working on basic rules 
+- [X] April 23: Working on basic rules
+- [X] April 30: Working on basic rules
+- [X] May 7: Working on basic rules
+- [X] May 14: Working on basic rules
+- [X] May 21: Done with basic rules
+- [X] May 28: Working on Min/Max Alpha/Beta
 - [ ] June 4: Done with Min/Max Alpha/Beta
-- [ ] June 11: Improvements and Additional Testing
 
+## Reality
+Blah Blah Blah
+### Code Analysis
+Code Code Code
+### Mistakes
+Min/Max, 120board vs 64board, counting 0 or not
+### Overview
+Blah Blah Blah
 
