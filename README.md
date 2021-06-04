@@ -334,9 +334,123 @@ def hit_detec(movestart,moveend):
 ```
 
 #### Specialized Eligibility
-
-
-
+In addition to the standard moves, specialized moves available in only very specific situations must also be calculated. The very first of these is en passant, a move that allows you to take your opponent’s pawn on the square if jumped through if on the previous move it advanced two positions.
+```
+[ 0 ][ 0 ][ p ]			[ 0 ][ P ][ p ]			[ 0 ][ 0 ][ 0 ]
+[ 0 ][ 0 ][ 0 ]			[ 0 ][ 0 ][ 0 ]			[ 0 ][ p ][ 0 ]
+[ P ][ P ][ P ]			[ P ][ 0 ][ P ]			[ P ][ 0 ][ P ]
+```
+The basis of the criteria is checking the last move, by checking the last index of old_movestart and old_moveend, and making sure that it was a pawn move that advanced two squares. Then, it checks to see if the requested ending square is the square that the pawn jumped over, and whether the starting square is next to the piece that is being taken. 
+```ruby
+	elif (len(old_movestart) > 0) and (((old_movestart[-1])-(old_moveend[-1])) == (-16*pawn_move_direction)):
+		if (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')) and (((old_moveend[-1]) - (8*pawn_move_direction)) == (moveend)):
+			if ((board120[(move_convtr_64120(movestart)) + 1]) == (board120[move_convtr_64120(old_moveend[-1])])):
+				if (pawn_move_direction == -1) and ((movestart-moveend) == (9*pawn_move_direction)):
+					return True
+```
+Then, since the ending square of en passant is not the square where the piece being taken actually is, I created a small function that determines if the last move was en passant, and if it was, it removes the pawn that was supposed to be taken.
+```ruby
+def en_passant():
+	global last_piece_taken
+	global old_movestart
+	global old_moveend
+	if (len(old_movestart) > 0) and (last_piece_taken == '0') and (abs(old_movestart[-1]-old_moveend[-1]) in (7,9)) and (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')):
+		if board120[move_convtr_64120(old_moveend[-1])] == 'p':
+			last_piece_taken = 'P'
+			board64[last_moveend - 8] = '0'
+		else:
+			last_piece_taken = 'p'
+			board64[last_moveend + 8] = '0'
+```
+The other unique pawn move is a pawn promotion, where a pawn reaching the end of the board can become either a rook, bishop, knight, or queen. To do this I created a function called pawn_promotion() that determines if a pawn just reached the end of the board, and if it’s a human’s turn, it gives them the option of choosing what piece they want, and if it’s the computer’s turn, it turns the pawn into a queen.
+```ruby
+def pawn_promotion():
+	global old_moveend
+	global pawn_promotion_unmove_state
+	global pawn_promotion_unmove_old_value
+	pawn_promotion_unmove_state = False
+	pawn_promotion_unmove_old_value = ''
+	new_piece_input_works = False
+	if (len(old_moveend) > 0) and (old_moveend[-1] in (0,1,2,3,4,5,6,7,56,57,58,59,60,61,62,63)) and (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')):
+		pawn_promotion_unmove_old_value = board120[move_convtr_64120(old_moveend[-1])]
+		pawn_promotion_unmove_state = True
+		if (one_player == True) and (iswhitemove != comp_goes_first):
+			if (old_moveend[-1] in (0,1,2,3,4,5,6,7)):
+				new_piece = "Q"
+			else:
+				new_piece = 'q'
+		else:
+			while new_piece_input_works == False:
+				new_piece_input = input("Type what piece you want to promote your pawn to:\n")
+				if (old_moveend[-1] in (0,1,2,3,4,5,6,7)):
+					if new_piece_input in ("Knight","knight","N","n","Night","night","Nite","nite","Horse","horse"):
+						new_piece = "N"
+						new_piece_input_works = True
+					elif new_piece_input in ("Rook","rook","R","r","Rock","rock","Rok","rok","Castle","castle","Tower","tower"):
+						new_piece = "R"
+						new_piece_input_works = True
+					elif new_piece_input in ("Bishop","bishop","B","b","Priest","priest"):
+						new_piece = "B"
+						new_piece_input_works = True
+					elif new_piece_input in ("Queen","queen","Q","q"):
+						new_piece = "Q"
+						new_piece_input_works = True
+					else:
+						print("Please type a valid piece (Kings and Pawns are not allowed)")
+				else:
+					if new_piece_input in ("Knight","knight","N","n","Night","night","Nite","nite","Horse","horse"):
+						new_piece = "n"
+						new_piece_input_works = True
+					elif new_piece_input in ("Rook","rook","R","r","Rock","rock","Rok","rok","Castle","castle","Tower","tower"):
+						new_piece = "r"
+						new_piece_input_works = True
+					elif new_piece_input in ("Bishop","bishop","B","b","Priest","priest"):
+						new_piece = "b"
+						new_piece_input_works = True
+					elif new_piece_input in ("Queen","queen","Q","q"):
+						new_piece = "q"
+						new_piece_input_works = True
+					else:
+						print("Please type a valid piece (Kings and Pawns are not allowed)")
+		board64[old_moveend[-1]] = new_piece
+```
+The final, and most complex, special move is castling, where a rook and king that have never moved can both move past each other, as long as the king is not in check, does not pass through check, or does not end up in check. To complete this demanding task, I split up the first half into a basic eligibility requirement in move_king_is_legal, and the second half to only be run through total eligibility. The first check is fairly simple just determining if the king is moving right or left two squares, if there is nothing between it and the rook, if the king has never moved, and if the rook it is moving towards has also never moved. 
+```ruby
+	elif abs(movestart-moveend) == 2:
+		move_king_sign2 = -abs(movestart-moveend) / (movestart-moveend)
+		move_king_sign2 = int(move_king_sign2)
+		if (board120[(move_convtr_64120(movestart))+(2*move_king_sign2)] == '0') and (hit_detec(movestart,moveend) == True):
+			global old_movestart
+			global old_moveend
+			if ((iswhitemove == True) and (60 not in old_movestart)):
+				if (((movestart-moveend) == 2) and (56 not in old_movestart) and (board120[move_convtr_64120(56)] == 'R')) or (((movestart-moveend) == -2) and (63 not in old_movestart) and (board120[move_convtr_64120(63)] == 'R')):
+					return True
+				else:
+					return False
+			elif ((iswhitemove == False) and (4 not in old_movestart)):
+				if (((movestart-moveend) == 2) and (0 not in old_movestart) and (board120[move_convtr_64120(0)] == 'r')) or (((movestart-moveend) == -2) and (7 not in old_movestart) and (board120[move_convtr_64120(7)] == 'r')):
+					return True
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
+```
+The second part, which I will discuss more fully in the next section, essentially checks to see if an opponent, on the next turn, could move to the square that the king passed through. If it could, it would mean that the king, on its turn, is castling through check, thereby invalidating the move.
+```ruby
+def castling_not_through_check(movestart,moveend):
+	castling_movement_direc = (movestart-moveend) / abs(movestart-moveend)
+	opp_eligible_moves()
+	castling_inbetween_move = movestart-(1*castling_movement_direc)
+	castling_inbetween_move = int(castling_inbetween_move)
+	if castling_inbetween_move in (opp_eligible_move_end):
+		return False
+	else:
+		return True
+```
 #### Total Eligibility
 
 
