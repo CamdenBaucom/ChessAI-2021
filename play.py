@@ -272,17 +272,13 @@ def en_passant():
 	global last_piece_taken
 	global old_movestart
 	global old_moveend
-	global en_passant_unmove_state
-	en_passant_unmove_state = False
 	if (len(old_movestart) > 0) and (last_piece_taken == '0') and (abs(old_movestart[-1]-old_moveend[-1]) in (7,9)) and (board120[move_convtr_64120(old_moveend[-1])] in ('p','P')):
 		if board120[move_convtr_64120(old_moveend[-1])] == 'p':
 			last_piece_taken = 'P'
 			board64[last_moveend - 8] = '0'
-			en_passant_unmove_state = True
 		else:
 			last_piece_taken = 'p'
 			board64[last_moveend + 8] = '0'
-			en_passant_unmove_state = True
 
 def pawn_promotion():
 	global old_moveend
