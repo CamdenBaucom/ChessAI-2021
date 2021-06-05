@@ -1,5 +1,4 @@
-# ChessAI
-# A Chess Program
+# ChessAI: A Chess Program
 # By: Camden Baucom
 
 board120 = ['-1','-1','-1','-1','-1','-1','-1','-1','-1','-1',
@@ -680,46 +679,47 @@ def one_player():
 		else:
 			print('Please type one or two to play. Otherwise type exit to leave.')
 
-def board_eval():
-	global white_board_eval
-	global black_board_eval
-	global iswhitemove
-	global comp_board_eval
-	global opp_board_eval
-	white_board_eval = 0
-	black_board_eval = 0
-	for i in range(64):
-		if board64[i] == 'P':
-			white_board_eval += 1
-		elif board64[i] == 'p':
-			black_board_eval += 1
-		elif board64[i] == 'N':
-			white_board_eval += 3
-		elif board64[i] == 'n':
-			black_board_eval += 3
-		elif board64[i] == 'B':
-			white_board_eval += 3
-		elif board64[i] == 'b':
-			black_board_eval += 3
-		elif board64[i] == 'R':
-			white_board_eval += 5
-		elif board64[i] == 'r':
-			black_board_eval += 5
-		elif board64[i] == 'Q':
-			white_board_eval += 9
-		elif board64[i] == 'q':
-			black_board_eval += 9
-		elif board64[i] == 'K':
-			white_board_eval += 500
-		elif board64[i] == 'k':
-			black_board_eval += 500
-	if (one_player == True):
-		if (comp_goes_first == True):
-			comp_board_eval = white_board_eval
-			opp_board_eval = black_board_eval
-		else:
-			comp_board_eval = black_board_eval
-			opp_board_eval = white_board_eval
+#def board_eval():
+#	global white_board_eval
+#	global black_board_eval
+#	global iswhitemove
+#	global comp_board_eval
+#	global opp_board_eval
+#	white_board_eval = 0
+#	black_board_eval = 0
+#	for i in range(64):
+#		if board64[i] == 'P':
+#			white_board_eval += 1
+#		elif board64[i] == 'p':
+#			black_board_eval += 1
+#		elif board64[i] == 'N':
+#			white_board_eval += 3
+#		elif board64[i] == 'n':
+#			black_board_eval += 3
+#		elif board64[i] == 'B':
+#			white_board_eval += 3
+#		elif board64[i] == 'b':
+#			black_board_eval += 3
+#		elif board64[i] == 'R':
+#			white_board_eval += 5
+#		elif board64[i] == 'r':
+#			black_board_eval += 5
+#		elif board64[i] == 'Q':
+#			white_board_eval += 9
+#		elif board64[i] == 'q':
+#			black_board_eval += 9
+#		elif board64[i] == 'K':
+#			white_board_eval += 500
+#		elif board64[i] == 'k':
+#			black_board_eval += 500
+#	if (one_player == True):
+#		if (comp_goes_first == True):
+#			comp_board_eval = white_board_eval
+#			opp_board_eval = black_board_eval
+#		else:
+#			comp_board_eval = black_board_eval
+#			opp_board_eval = white_board_eval
+
 #def unmove_more():
 #	global old_movestart
 #	global old_moveend
