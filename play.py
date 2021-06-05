@@ -583,24 +583,6 @@ def in_check():
 		in_check = False
 		return in_check
 
-def leads_to_check(movestart,moveend):
-	if (test_move(movestart,moveend)) == True:
-		upd_board_64120()
-		global iswhitemove
-		iswhitemove = not iswhitemove
-		if (in_check()) == True:
-			iswhitemove = not iswhitemove
-			unmove()
-			upd_board_64120()
-			return True
-		else:
-			iswhitemove = not iswhitemove
-			unmove()
-			upd_board_64120()
-			return False
-	else:
-		iswhitemove = not iswhitemove
-
 def in_check_moves():
 	global in_check_eligible_move_start
 	global in_check_eligible_move_end
