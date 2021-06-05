@@ -28,7 +28,7 @@ Depth:4  (4)   (5)   (7)   (8)     (11)  (12) (14)  (15)
 Essentially, the idea is that the computer chooses random moves for both sides going to the end depth and evaluates the position for both sides, assigning a min (for opponent) and max (for computer) value. Additionally, since both values can be negative or positive, to show who is ahead, the overall value is the sum of the min and max. The computer then looks at the sibling nodes and evaluates the min or max value for that position and if that value is greater than the previous value, the min/max is updated, since the computer always assumes that the best move will be played. Once all siblings have been evaluated the computer moves back to a parent's sibling and their children, updating min/max only at end nodes. Whenever a position updates the min/max value its path is stored so that if it is the best overall the computer can execute it. An easy improvement to this system is called Alpha-Beta Pruning, which just allows the computer to stop looking at other siblings once one has been determined to have a worse min/max (or Alpha/Beta). For example, if a computer move has a best response of being up a queen, but a different computer move has one response of being down a queen, there is no need to look at all the other opponent responses since at least one is worse for the computer, thus greatly reducing the number of variants that must be searched and evaluated.
 
 ### Advanced Additions
-If there is enough time, I hope to implement two systems that will greatly increase the computer's level of play. First is an opening book, which stores commonly used and studied game opening which the computer chooses randomly from to start the game. This eliminates early game move searching and evaluating, speeding up the game and making each move unique. The second is an Endgame book, which stores common endgames with known outcomes and searches the board to see if they are applicable.
+If there is enough time, I hope to implement two systems that will greatly increase the computer's level of play. First is an opening book, which stores commonly used and studied game openings which the computer chooses randomly from to start the game. This eliminates early game move searching and evaluating, speeding up the game and making each move unique. The second is an Endgame book, which stores common endgames with known outcomes and searches the board to see if they are applicable.
 
 ### Timeline
 - [X] April 16: Working on basic rules 
@@ -760,4 +760,4 @@ def comp_moves(depth):
 ```
 
 ### Overview
-Blah Blah Blah
+After all the planning and all the coding, the project works, a chess program runs which allows you to play against some unseen artificial opponent. I am slightly disappointed that I didn’t achieve all the functionality that I had hoped I may, but ultimately I am proud of all the afterschool and weekend investment to yield a Chess AI.
