@@ -576,7 +576,85 @@ def in_check_moves():
 ``` 
 
 #### The Game
-
+With all of that complete, the final steps were to create the end conditions, allow the user to select the type of game they wanted to play, and then finally play the game. The end conditions were fairly simple: a game was over if there were no more eligible moves (if in_check_moves() returned nothing), with a win if someone was in check, and a stalemate if they weren’t. However, one more tricky element remained, in chess you can draw by repetition if the exact same board is repeated three times. In my program, I solved this by looking at the last eight completed moves, and determined that the game was a draw by repetition if both players twice in a row, went to a square and then returned. I did this, as it would indicate that a position was reached once before any moves started, twice once they both went somewhere and returned, and three times once they both went somewhere and returned again.
+```ruby
+def end_conditions():
+	in_check_moves()
+	global old_movestart
+	global old_moveend
+	if len(in_check_eligible_move_start) == 0:
+		if (in_check()) == True:
+			if iswhitemove == True:
+				print("Black Wins!")
+				return False
+			else:
+				print("White Wins!")
+				return False
+		else:
+			print("Draw by Stalemate")
+			return False
+	elif len(old_movestart) >= 8:
+		if ((old_movestart[-8],old_moveend[-8]) == (old_moveend[-6],old_movestart[-6]) == (old_movestart[-4],old_moveend[-4]) == (old_moveend[-2],old_movestart[-2])) and ((old_movestart[-7],old_moveend[-7]) == (old_moveend[-5],old_movestart[-5]) == (old_movestart[-3],old_moveend[-3]) == (old_moveend[-1],old_movestart[-1])):
+			print("Draw by Repetion")
+			return False
+		else:
+			return True
+	else:
+		return True
+```
+Then I created a simple input function to determine whether the player wanted to face the computer or not, and if so whether they wanted to go first.
+```ruby
+	while x == True:
+		player = input('Would you like to play in One player (versus the Computer) or Two player?\n')
+		if player in ('one','One','1'):
+			while x == True:
+				first_move = input('Would you like to go first or second?\n')
+				if first_move in ('first','First','1st','1','one','One'):
+					one_player = True
+					comp_goes_first = False
+					x = False
+				elif first_move in ('second','Second','2nd','2','two','Two'):
+					one_player = True
+					comp_goes_first = True
+					x = False
+				elif first_move in ('exit','Exit','leave','Leave'):
+					quit()
+				else:
+					print('Please type first or second to play. Otherwise type exit to leave.')
+		elif player in ('two','Two','2'):
+			one_player = False
+			x = False
+		elif player in ('exit','Exit','Leave','leave'):
+			quit()
+		else:
+			print('Please type one or two to play. Otherwise type exit to leave.')
+```
+Finally it was time to make the function that actually plays the game. To begin, I made it so that while none of the end condition parameters were met, the program would loop forever. First it would show the board, and tell the user whose turn it was. Then, if it was a human’s turn (either by the user choosing to not play against the computer, or by it simply being their turn), it would request an input and run it through move(). If that input was not a valid move, it would tell the user it wasn’t possible and repeat the cycle, but if it was, it would update the 120 square board, check to see if it was a specialized move and update the boarding accordingly, and then end the turn and repeat the cycle. If it was ever the computer’s turn, I imported the random module, and made the computer select a random move from in_check_moves(). Now complete, it was possible to play a game of chess.
+```ruby
+def play():
+	while (end_conditions() == True):
+		show_board()
+		if iswhitemove == True:
+			print("White's Move")
+		else:
+			print("Black's Move")
+		if (one_player == False) or ((one_player == True) and iswhitemove != comp_goes_first):
+			x = input('Starting move:\n')
+			y = input('Ending move:\n')
+			x = board_notation_convtr(x)
+			y = board_notation_convtr(y)
+		else:
+			random_choice = len(in_check_eligible_move_start) - 1
+			random_choice = random.randint(0,random_choice)
+			x = in_check_eligible_move_start[random_choice]
+			y = in_check_eligible_move_end[random_choice]
+		move(x,y)
+		upd_board_64120()
+		castling()
+		en_passant()
+		pawn_promotion()
+		upd_board_64120()
+```
 
 ### Mistakes
 Min/Max, board120 vs board64, counting 0 or not
