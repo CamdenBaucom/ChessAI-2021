@@ -657,6 +657,107 @@ def play():
 ```
 
 ### Mistakes
-Min/Max, board120 vs board64, counting 0 or not
+A plethora of mistakes were made throughout this process, some small and others, component wrecking. The first mistake I made was inconsistent counting of zero. When we count, we almost always start at 1 and count up from there, but in terms of array elements, they always begin at 0 and then begin counting up. This meant that the last array element of a 64 square chess board, would be number 63. In light of this I had adopted in some places a counting system with 0 as the first number, but in other places I had used systems that began at 1, causing errors and unintended consequences throughout the program. Finally I acquiesced and went through everything, line by line, and changed it all to a counting system, with 0 as the first number.
+
+While initially working on the basic move eligibility I began to base almost all of my logic on the 64 square board, even when using the 120 square board would be significantly easier and more efficient. At a certain point I realized what I was doing and, and had to go back and update my code to use the 120 square board, which I had chosen and implemented specifically for that purpose. Although it cost me time in the short term, the avoidance of future headaches was worth the trouble.
+
+Now for the big one, the program not using the Min/Max of which the majority of my planning was centered. After creating the functional game, I began, as I had planned, to work on creating a depth search from which to advise specific moves for the computer. To aid this process I created a board_eval() function, that counted up the pieces on the board for both colors.
+```ruby
+def board_eval():
+	global white_board_eval
+	global black_board_eval
+	global iswhitemove
+	global comp_board_eval
+	global opp_board_eval
+	white_board_eval = 0
+	black_board_eval = 0
+	for i in range(64):
+		if board64[i] == 'P':
+			white_board_eval += 1
+		elif board64[i] == 'p':
+			black_board_eval += 1
+		elif board64[i] == 'N':
+			white_board_eval += 3
+		elif board64[i] == 'n':
+			black_board_eval += 3
+		elif board64[i] == 'B':
+			white_board_eval += 3
+		elif board64[i] == 'b':
+			black_board_eval += 3
+		elif board64[i] == 'R':
+			white_board_eval += 5
+		elif board64[i] == 'r':
+			black_board_eval += 5
+		elif board64[i] == 'Q':
+			white_board_eval += 9
+		elif board64[i] == 'q':
+			black_board_eval += 9
+		elif board64[i] == 'K':
+			white_board_eval += 500
+		elif board64[i] == 'k':
+			black_board_eval += 500
+	if (one_player == True):
+		if (comp_goes_first == True):
+			comp_board_eval = white_board_eval
+			opp_board_eval = black_board_eval
+		else:
+			comp_board_eval = black_board_eval
+			opp_board_eval = white_board_eval
+```
+I then created a new unmove_more() function that allowed me to go back as many moves as I wanted, because the original function could only go back one move. I did this, as I anticipated moving up and down between multiple depths, and I needed a way to undo lots of older moves.
+```ruby
+def unmove_more():
+	global old_movestart
+	global old_moveend
+	global old_piece_taken
+	board64[old_movestart.pop(-1)] = board64[old_moveend.pop(-1)]
+	board64[old_moveend.pop(-1)] = old_piece_taken.pop(-1)
+	global iswhitemove
+	iswhitemove = not iswhitemove
+```
+With those accompanying functions set up, I began the complex task of creating a depth search of unknown depth. My plan was to loop through all of the eligible moves, and for each make the opponent’s best response, and if that was the final depth, evaluate the position and choose the initial move that made the best end position, but if it was not, to loop through the first phase making all eligible moves again and making all of the opponent’s best responses to each again. It was only halfway through this process that I realized the fatal error of my logic: my program did not, and could not, understand the opponent’s best response. What I had done was loop through all of the opponents’ responses, and create an array only with the moves with the best position for the opponent. However, my means for doing this was to count up the pieces on the board, but you can never lose your pieces on your turn. Well I thought, I will just have to evaluate that through what the opponent allows you to do. But there was the final nail in the coffin, the program could never understand whether the opponent was forced into making a bad move, or if they had just made a completely unreasonable move that would not happen in reality. Without a way to distinguish this, my program could either find the best moves if the opponent was working to lose, or the best moves if it was working to lose. With no possible solution, I had to scrap it, but I decided to leave it all commented out in the code, as a memento to my original plan and my work invested. Below is what I had completed, when I realized that it would no longer work.
+```ruby
+def comp_moves(depth):
+	global best_move_start
+	global best_move_end
+	in_check_moves()
+	best_move_start = in_check_eligible_move_start[-1]
+	best_move_end = in_check_eligible_move_end[-1]
+	depth_move_start_1 = in_check_eligible_move_start
+	depth_move_end_1 = in_check_eligible_move_end
+	x = True
+	mydict = {}
+	for i in range(1,(depth + 1)):
+		while x == True:
+			in_check_moves()
+			mydict["move_start_depth" + str(i)] = in_check_eligible_move_start
+			mydict["move_end_depth" + str(i)] = in_check_eligible_move_end
+			current_move_start = mydict["move_start_depth" + str(i)].pop(-1)
+			current_move_end = mydict["move_end_depth" + str(i)].pop(-1)
+			move(current_move_start,current_move_end)
+			in_check_moves()
+			best_opp_board_eval = 0
+			mydict["opp_move_start_depth" + str(i)] = []
+			mydict["opp_move_end_depth" + str(i)] = []
+			while (len(in_check_eligible_move_start) > 0):
+				move(in_check_eligible_move_start[-1],in_check_eligible_move_end[-1])
+				board_eval()
+				if opp_board_eval == best_opp_board_eval:
+					mydict["opp_move_start_depth" + str(i)].append(in_check_eligible_move_start[-1])
+					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
+				elif opp_board_eval > best_opp_board_eval:
+					best_opp_board_eval = opp_board_eval
+					mydict["opp_move_start_depth" + str(i)].clear()
+					mydict["opp_move_end_depth" + str(i)].clear()
+					mydict["opp_move_start_depth" + str(i)].append(in_check_eligible_move_start[-1])
+					mydict["opp_move_end_depth" + str(i)].append(in_check_eligible_move_end[-1])
+				del in_check_eligible_move_start[-1]
+				del in_check_eligible_move_end[-1]
+				unmove_more()
+			unmove_more()
+			if len(mydict["move_start_depth" + str(i)]) == 0:
+				x = False
+```
+
 ### Overview
 Blah Blah Blah
