@@ -452,8 +452,128 @@ def castling_not_through_check(movestart,moveend):
 		return True
 ```
 #### Total Eligibility
+A key part of the project was the ability for the computer to know all of its eligible moves and select one, which is substantially more difficult than simply testing one singular move. To do this I broke it down further into eligibility without regards to check and then eligibility with regards to check. I should mention that in chess, you are never allowed to make a move that puts your king into check, which makes it an overarching test for every single eligible move. For the first part, determining all eligible moves without the final check test, required testing all conceivably possible moves to see which ones were really eligible. To begin with, I tested every single starting position (a square with the correct color piece) at every single ending position (0-63). This worked, but was quite slow, so I changed it to only test ending positions that were possible with the starting position. For example, pawns would only have an ending position of a distance of 8, 16, 9, or 7 (1 forward, two forward, diagonal forward and right, diagonal forward and left respectively) from the starting position. With that information, to actually write the code, I wrote a range function that searched the board for pieces whose turn it was and appended them to a big array. With that I popped the first index of the array, determined the piece, and created another array with all possible end positions based on what I just previously mentioned. I then tested the one starting move with every single possible ending move from the array, and if it passed move_is_legal(), then it was added to a final array called eligible_move_start[] and eligible_move_end[].
+```ruby
+def eligible_moves():
+	global eligible_move_end
+	global eligible_move_start
+	eligible_move_end = []
+	eligible_move_start = []
+	possible_move_start = []
+	test_possible_move_start = []
+	possible_move_start = []
+	test_possible_move_end = []
+	if iswhitemove == True:
+		for i in range(64):
+			if board120[(move_convtr_64120(i))] in ('P','R','N','B','Q','K'):
+				possible_move_start.append(i)
+	else:
+		for i in range(64):
+			if board120[(move_convtr_64120(i))] in ('p','r','n','b','q','k'):
+				possible_move_start.append(i)
+	while len(possible_move_start) > 0:
+		test_possible_move_start = possible_move_start.pop(0)
+		if board120[move_convtr_64120(test_possible_move_start)] in ('p'):
+			test_possible_move_end.extend((test_possible_move_start + 8, test_possible_move_start + 16, test_possible_move_start + 7, test_possible_move_start + 9))
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('P'):
+			test_possible_move_end.extend((test_possible_move_start - 8, test_possible_move_start - 16, test_possible_move_start - 7, test_possible_move_start - 9))
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('R','r'):
+			test_possible_move_end_rook_squares = [1,2,3,4,5,6,7,-1,-2,-3,-4,-5,-6,-7,8,16,24,32,40,48,56,-8,-16,-24,-32,-40,-48,-56]
+			while len(test_possible_move_end_rook_squares) > 0:
+				test_possible_move_end_rook = test_possible_move_end_rook_squares.pop(0)
+				if (test_possible_move_start+test_possible_move_end_rook >= 0) and (test_possible_move_start + test_possible_move_end_rook <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_rook)
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('N','n'):
+			test_possible_move_end_knight_squares = [6,10,15,17,-6,-10,-15,-17]
+			while len(test_possible_move_end_knight_squares) > 0:
+				test_possible_move_end_knight = test_possible_move_end_knight_squares.pop(0)
+				if (test_possible_move_start+test_possible_move_end_knight >= 0) and (test_possible_move_start + test_possible_move_end_knight <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_knight)
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('B','b'):
+			test_possible_move_end_bishop_squares = [7,14,21,28,35,42,49,9,18,27,36,45,54,63,-7,-14,-21,-28,-35,-42,-49,-9,-18,-27,-36,-45,-54,-63]
+			while len(test_possible_move_end_bishop_squares) > 0:
+				test_possible_move_end_bishop = test_possible_move_end_bishop_squares.pop(0)
+				if (test_possible_move_start+test_possible_move_end_bishop >= 0) and (test_possible_move_start + test_possible_move_end_bishop <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_bishop)
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('Q','q'):
+			test_possible_move_end_queen_squares = [1,2,3,4,5,6,-1,-2,-3,-4,-5,-6,8,16,24,32,40,48,56,-8,-16,-24,-32,-40,-48,-56,7,14,21,28,35,42,49,9,18,27,36,45,54,63,-7,-14,-21,-28,-35,-42,-49,-9,-18,-27,-36,-45,-54,-63]
+			while len(test_possible_move_end_queen_squares) > 0:
+				test_possible_move_end_queen = test_possible_move_end_queen_squares.pop(0)
+				if (test_possible_move_start+test_possible_move_end_queen >= 0) and (test_possible_move_start + test_possible_move_end_queen <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_queen)
+		elif board120[move_convtr_64120(test_possible_move_start)] in ('K','k'):
+			test_possible_move_end_king_squares = [1,2,7,8,9,-1,-2,-7,-8,-9]
+			while len(test_possible_move_end_king_squares) > 0:
+				test_possible_move_end_king = test_possible_move_end_king_squares.pop(0)
+				if (test_possible_move_start+test_possible_move_end_king >= 0) and (test_possible_move_start + test_possible_move_end_king <= 63):
+					test_possible_move_end.append(test_possible_move_start + test_possible_move_end_king)
+		while len(test_possible_move_end) > 0:
+			possible_move_end = test_possible_move_end.pop(0)
+			if (move_is_legal(test_possible_move_start,possible_move_end)) == True:
+				eligible_move_start.append(test_possible_move_start)
+				eligible_move_end.append(possible_move_end)
+```
+Accompanying eligible_moves() was opp_eligible_moves(), which determined all the opponents eligible moves by temporarily flipping the value of the iswhitemove boolean. Then, as a final function of this subsection, I created both_eligible_moves() which determined both your and the opponent’s moves. Although I could have boiled all three functions into one, I determined that doing so would decrease efficiency, by requiring the function to run the fairly intensive function twice no matter the circumstance, when usually I only needed to run one of the two. 
 
-
+With all eligibility without regards to check complete, I began to work on the in_check() function, whose basis was quite simple. I used a range function to determine the position of the king, and then run opp_eligible_moves(), and if one of the opponent’s eligible ending squares was the position of the king, the king was in check. 
+```ruby
+	if iswhitemove == True:
+		for i in range(64):
+			if board120[move_convtr_64120(i)] == 'K':
+				king_pos = i
+	else:
+		for i in range(64):
+			if board120[move_convtr_64120(i)] == 'k':
+				king_pos = i
+	opp_eligible_moves()
+	if king_pos in (opp_eligible_move_end):
+		in_check = True
+		return in_check
+	else:
+		in_check = False
+		return in_check
+```
+With everything established, it was time to start the final and total eligibility determining function, in_check_moves(). For most moves it was quite simple, just run eligible_moves(), put those moves through test_move(), and if the resulting position did not put you in check, then the move was good to go. The only move that did not fit this bill was castling, because castling needed to run in_check() at multiple stages (before, during, and after the move), but in_check() runs opp_eligible_moves() which runs eligible_moves(), and so if I put in_check() at an earlier stage the function would enter a feedback loop by determining eligible king moves in eligible_moves(), checking if the king was initially in check and whether it castled through check, calling in_check(), eventually calling eligible_moves(), causing the code to ping back and forever ad infinitum. So, inside of in_check_moves(), the code having already determined the basic castling requirements (the king and rook have never moved, and there's nothing between them), I now called castling_not_through_check(), putting me outside of the loop (as eligible_moves() had already been run), allowing me to check the eligibility of castling, and finally, all moves. 
+```ruby
+def in_check_moves():
+	global in_check_eligible_move_start
+	global in_check_eligible_move_end
+	global iswhitemove
+	in_check_eligible_move_start = []
+	in_check_eligible_move_end = []
+	both_eligible_moves()
+	in_check_possible_eligible_move_start = eligible_move_start
+	in_check_possible_eligible_move_end = eligible_move_end
+	while len(in_check_possible_eligible_move_start) > 0:
+		test_in_check_possible_eligible_move_start = in_check_possible_eligible_move_start.pop(0)
+		test_in_check_possible_eligible_move_end = in_check_possible_eligible_move_end.pop(0)
+		if (abs(test_in_check_possible_eligible_move_start-test_in_check_possible_eligible_move_end) == 2) and (board120[move_convtr_64120(test_in_check_possible_eligible_move_start)] in ('K','k')):
+			if ((in_check()) == False) and (castling_not_through_check(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end) == True):
+				if (test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)) == True:
+					upd_board_64120()
+					iswhitemove = not iswhitemove
+					if (in_check()) == False:
+						in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
+						in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
+					iswhitemove = not iswhitemove
+					eligible_moves()
+					unmove()
+					upd_board_64120()
+				else:
+					iswhitemove = not iswhitemove
+		elif (test_move(test_in_check_possible_eligible_move_start,test_in_check_possible_eligible_move_end)) == True:
+			upd_board_64120()
+			iswhitemove = not iswhitemove
+			if (in_check()) == False:
+				in_check_eligible_move_start.append(test_in_check_possible_eligible_move_start)
+				in_check_eligible_move_end.append(test_in_check_possible_eligible_move_end)
+			iswhitemove = not iswhitemove
+			eligible_moves()
+			unmove()
+			upd_board_64120()
+		else:
+			iswhitemove = not iswhitemove
+``` 
 
 #### The Game
 
